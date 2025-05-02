@@ -135,7 +135,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/transactions/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      const transaction = await storage.getTransactionById(parseInt(id));
+      
+      // Validate ID is a valid number
+      const parsedId = Number(id);
+      if (isNaN(parsedId)) {
+        return res.status(400).json({ error: 'Invalid transaction ID format' });
+      }
+      
+      const transaction = await storage.getTransactionById(parsedId);
       
       if (!transaction) {
         return res.status(404).json({ error: 'Transaction not found' });
@@ -233,7 +240,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/debts/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      const debt = await storage.getDebtById(parseInt(id));
+      
+      // Validate ID is a valid number
+      const parsedId = Number(id);
+      if (isNaN(parsedId)) {
+        return res.status(400).json({ error: 'Invalid debt ID format' });
+      }
+      
+      const debt = await storage.getDebtById(parsedId);
       
       if (!debt) {
         return res.status(404).json({ error: 'Debt not found' });
@@ -250,8 +264,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/debts/:id/pay', async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // Validate ID is a valid number
+      const parsedId = Number(id);
+      if (isNaN(parsedId)) {
+        return res.status(400).json({ error: 'Invalid debt ID format' });
+      }
+      
       const userData = await storage.getUserProfile();
-      const debt = await storage.getDebtById(parseInt(id));
+      const debt = await storage.getDebtById(parsedId);
       
       if (!debt) {
         return res.status(404).json({ error: 'Debt not found' });
@@ -295,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.createTransaction(transactionData);
       
       // Mark debt as paid
-      const paidDebt = await storage.markDebtAsPaid(parseInt(id));
+      const paidDebt = await storage.markDebtAsPaid(parsedId);
       
       res.json(paidDebt);
     } catch (error) {

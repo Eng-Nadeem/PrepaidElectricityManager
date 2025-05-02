@@ -228,24 +228,30 @@ const DashboardScreen = () => {
       </div>
       
       {/* Quick Recharge */}
-      <Card className="mb-4">
+      <Card className="mb-5 border-0 card-shadow overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-indigo-600 to-primary"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">My Meters</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/meters')}>
+            <CardTitle className="text-lg text-gradient">My Meters</CardTitle>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/meters')}
+              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+            >
               View All
             </Button>
           </div>
           <CardDescription>Select a meter to recharge</CardDescription>
         </CardHeader>
         
-        <CardContent className="p-4">
+        <CardContent className="p-5">
           {/* Recent Meters */}
-          <div className="flex overflow-x-auto pb-2 gap-2">
+          <div className="flex overflow-x-auto pb-2 gap-3">
             {isMetersLoading ? (
-              <div className="py-6 px-4 text-center w-full">
-                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
-                <p className="text-sm text-gray-500">Loading meters...</p>
+              <div className="py-8 px-4 text-center w-full">
+                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3"></div>
+                <p className="text-sm text-gray-500">Loading your meters...</p>
               </div>
             ) : recentMeters && recentMeters.length > 0 ? (
               recentMeters.map((meter) => (
@@ -253,14 +259,19 @@ const DashboardScreen = () => {
                   key={meter.id} 
                   meter={meter} 
                   onSelect={handleMeterSelect}
+                  className="min-w-[200px] card-shadow hover:shadow-md transition-all"
                 />
               ))
             ) : (
-              <div className="py-6 px-4 text-center w-full">
-                <p className="text-sm text-gray-500 mb-3">No meters found</p>
-                <Button onClick={() => navigate('/meters')}>
+              <div className="py-8 px-4 text-center w-full bg-gray-50/50 rounded-xl border border-gray-100">
+                <PlusCircleIcon className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 mb-4">No meters have been added yet</p>
+                <Button 
+                  onClick={() => navigate('/meters')}
+                  className="btn-gradient"
+                >
                   <PlusCircleIcon className="mr-2 h-4 w-4" />
-                  Add Meter
+                  Add Your First Meter
                 </Button>
               </div>
             )}
@@ -269,44 +280,66 @@ const DashboardScreen = () => {
       </Card>
       
       {/* Recent Transactions */}
-      <Card className="mb-4">
+      <Card className="mb-5 border-0 card-shadow overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">Recent Transactions</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/history')}>
+            <CardTitle className="text-lg text-gradient">Recent Transactions</CardTitle>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/history')}
+              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+            >
               View All
             </Button>
           </div>
           <CardDescription>Your recent electricity purchases</CardDescription>
         </CardHeader>
         
-        <CardContent className="p-4">
+        <CardContent className="p-5">
           <div className="space-y-3">
             {isTransactionsLoading ? (
-              <div className="py-6 px-4 text-center">
-                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
-                <p className="text-sm text-gray-500">Loading transactions...</p>
+              <div className="py-8 px-4 text-center">
+                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-3"></div>
+                <p className="text-sm text-gray-500">Loading your transactions...</p>
               </div>
             ) : recentTransactions && recentTransactions.length > 0 ? (
               recentTransactions.map((transaction) => (
-                <TransactionCard key={transaction.id} transaction={transaction} />
+                <TransactionCard 
+                  key={transaction.id} 
+                  transaction={transaction} 
+                  className="card-shadow hover:shadow-md transition-all border border-gray-100 rounded-xl"
+                />
               ))
             ) : (
-              <div className="py-6 text-center text-gray-500">No transactions yet</div>
+              <div className="py-8 text-center bg-gray-50/50 rounded-xl border border-gray-100">
+                <ReceiptIcon className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 mb-3">No transactions have been made yet</p>
+                <Button 
+                  onClick={() => navigate('/recharge')}
+                  className="btn-gradient"
+                >
+                  <LightbulbIcon className="mr-2 h-4 w-4" />
+                  Make First Purchase
+                </Button>
+              </div>
             )}
           </div>
         </CardContent>
         
-        <CardFooter className="pt-0 pb-4 px-4">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => navigate('/history')}
-          >
-            View All Transactions
-            <ArrowRightCircleIcon className="ml-2 h-4 w-4" />
-          </Button>
-        </CardFooter>
+        {recentTransactions && recentTransactions.length > 0 && (
+          <CardFooter className="pt-0 pb-5 px-5">
+            <Button 
+              variant="outline" 
+              className="w-full border-blue-100 hover:bg-blue-50 text-blue-600"
+              onClick={() => navigate('/history')}
+            >
+              View All Transactions
+              <ArrowRightCircleIcon className="ml-2 h-4 w-4" />
+            </Button>
+          </CardFooter>
+        )}
       </Card>
       
       {/* Client Information */}
