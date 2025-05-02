@@ -92,28 +92,28 @@ const DashboardScreen = () => {
   return (
     <div className="slide-in px-4 pt-4 pb-8">
       {/* Welcome Card */}
-      <Card className="mb-5 overflow-hidden card-shadow border-0">
+      <Card className="mb-5 overflow-hidden card-shadow-lg border-0">
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600"></div>
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] bg-[length:20px_20px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-primary to-blue-700"></div>
+          <div className="absolute inset-0 opacity-10 bg-pattern-dots"></div>
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mb-10"></div>
           <CardContent className="p-6 relative text-white">
-            <h2 className="text-xl font-semibold mb-1">Welcome{userProfile?.fullName ? `, ${userProfile.fullName.split(' ')[0]}` : ''}!</h2>
+            <h2 className="text-xl font-bold mb-1">Welcome{userProfile?.fullName ? `, ${userProfile.fullName.split(' ')[0]}` : ''}!</h2>
             <p className="text-sm text-white/90 mb-5">What would you like to do today?</p>
             
             <div className="flex flex-wrap gap-2">
               <Button 
-                variant="secondary" 
                 size="sm" 
-                className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                className="bg-white/25 hover:bg-white/40 text-white border-0 shadow-sm hover:shadow-md transition-all rounded-lg"
                 onClick={() => navigate('/recharge')}
               >
                 <LightbulbIcon className="h-4 w-4 mr-2" />
                 Quick Recharge
               </Button>
               <Button 
-                variant="secondary" 
                 size="sm" 
-                className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                className="bg-white/25 hover:bg-white/40 text-white border-0 shadow-sm hover:shadow-md transition-all rounded-lg"
                 onClick={() => navigate('/wallet')}
               >
                 <WalletIcon className="h-4 w-4 mr-2" />
@@ -121,9 +121,8 @@ const DashboardScreen = () => {
               </Button>
               {pendingDebtsCount > 0 && (
                 <Button 
-                  variant="secondary" 
                   size="sm" 
-                  className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                  className="bg-amber-500/80 hover:bg-amber-500/100 text-white border-0 shadow-sm hover:shadow-md transition-all rounded-lg"
                   onClick={() => navigate('/debts')}
                 >
                   <AlertTriangleIcon className="h-4 w-4 mr-2" />
@@ -138,18 +137,17 @@ const DashboardScreen = () => {
       {/* Quick Actions & Stats */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <Card className="col-span-1 border-0 card-shadow overflow-hidden">
-          <div className="h-1 bg-green-500"></div>
-          <CardContent className="p-5">
+          <div className="h-1.5 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500"></div>
+          <CardContent className="p-5 bg-gradient-to-br from-white to-green-50">
             <div className="flex items-center gap-2 mb-2">
               <WalletIcon className="h-4 w-4 text-green-600" />
               <p className="text-sm font-medium text-gray-700">Wallet Balance</p>
             </div>
-            <p className="text-2xl font-semibold text-gradient mb-1">{formatCurrency(walletBalance)}</p>
+            <p className="text-2xl font-semibold text-gradient-green mb-1">{formatCurrency(walletBalance)}</p>
             <div className="mt-3">
               <Button 
-                variant="outline" 
+                className="w-full btn-gradient-green border-0"
                 size="sm" 
-                className="w-full border-green-100 text-green-600 hover:bg-green-50"
                 onClick={() => navigate('/wallet')}
               >
                 <PlusCircleIcon className="h-4 w-4 mr-2" />
@@ -160,22 +158,21 @@ const DashboardScreen = () => {
         </Card>
         
         <Card className="col-span-1 border-0 card-shadow overflow-hidden">
-          <div className="h-1 bg-amber-500"></div>
-          <CardContent className="p-5">
+          <div className="h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500"></div>
+          <CardContent className="p-5 bg-gradient-to-br from-white to-amber-50">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangleIcon className="h-4 w-4 text-amber-600" />
               <p className="text-sm font-medium text-gray-700">Pending Debts</p>
             </div>
             <p className="text-2xl font-semibold mb-1">
-              <span className={pendingDebtsCount > 0 ? "text-amber-600" : "text-gray-600"}>
+              <span className={pendingDebtsCount > 0 ? "text-gradient-orange" : "text-gray-600"}>
                 {pendingDebtsCount}
               </span>
             </p>
             <div className="mt-3">
               <Button 
-                variant="outline" 
+                className={`w-full border-0 ${pendingDebtsCount > 0 ? "btn-gradient-orange" : "bg-gray-200 text-gray-600 hover:bg-gray-300"}`}
                 size="sm" 
-                className={`w-full ${pendingDebtsCount > 0 ? "border-amber-100 text-amber-600 hover:bg-amber-50" : "border-gray-200"}`}
                 onClick={() => navigate('/debts')}
               >
                 {pendingDebtsCount > 0 ? (
@@ -210,7 +207,7 @@ const DashboardScreen = () => {
           title="Pay Debts"
           description="Clear your pending bills"
           onClick={() => navigate('/debts')}
-          color="bg-amber-100"
+          color="from-amber-100 to-yellow-50"
         />
         
         <QuickActionButton
@@ -218,7 +215,7 @@ const DashboardScreen = () => {
           title="Manage Wallet"
           description="Add funds to your wallet"
           onClick={() => navigate('/wallet')}
-          color="bg-green-100"
+          color="from-green-100 to-emerald-50"
         />
         
         <QuickActionButton
@@ -226,7 +223,7 @@ const DashboardScreen = () => {
           title="Transaction History"
           description="View your past transactions"
           onClick={() => navigate('/history')}
-          color="bg-blue-100"
+          color="from-blue-100 to-sky-50"
         />
       </div>
       
