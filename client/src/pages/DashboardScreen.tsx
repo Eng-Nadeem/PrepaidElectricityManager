@@ -311,14 +311,14 @@ const DashboardScreen = () => {
               </div>
             )}
             
-            {userProfile?.phoneNumber && (
+            {userProfile?.phone && (
               <div className="p-3 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-500 mb-1">Phone Number</p>
-                <p className="text-sm">{userProfile.phoneNumber}</p>
+                <p className="text-sm">{userProfile.phone}</p>
               </div>
             )}
             
-            {!userProfile?.fullName && !userProfile?.address && !userProfile?.phoneNumber && (
+            {!userProfile?.fullName && !userProfile?.address && !userProfile?.phone && (
               <div className="text-center p-2">
                 <Button 
                   variant="outline" 

@@ -136,16 +136,32 @@ export const storage = {
       .from(transactions)
       .where(eq(transactions.status, 'success'));
       
+      if (!successfulTransactionsResult || successfulTransactionsResult.length === 0) {
+        return {
+          totalSpent: 0,
+          transactionCount: 0
+        };
+      }
+      
       const stats = successfulTransactionsResult[0];
       
-      // Ensure correct type conversion and default to 0 if NaN
-      const totalSpent = typeof stats.totalSpent === 'number' 
-        ? stats.totalSpent 
-        : parseFloat(stats.totalSpent?.toString() || '0') || 0;
-        
-      const count = typeof stats.transactionCount === 'number' 
-        ? stats.transactionCount 
-        : parseInt(stats.transactionCount?.toString() || '0') || 0;
+      // Ensure proper type handling for totalSpent
+      let totalSpent = 0;
+      if (stats.totalSpent !== null && stats.totalSpent !== undefined) {
+        const parsed = parseFloat(String(stats.totalSpent));
+        if (!isNaN(parsed)) {
+          totalSpent = parsed;
+        }
+      }
+      
+      // Ensure proper type handling for transactionCount
+      let count = 0;
+      if (stats.transactionCount !== null && stats.transactionCount !== undefined) {
+        const parsed = parseInt(String(stats.transactionCount));
+        if (!isNaN(parsed)) {
+          count = parsed;
+        }
+      }
       
       return {
         totalSpent: totalSpent,
