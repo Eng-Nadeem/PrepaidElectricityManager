@@ -44,12 +44,13 @@ const SuccessScreen = () => {
     navigate('/');
   };
   
-  // Determine if this is a debt payment or recharge
+  // Determine what type of payment this is
   const isDebtPayment = type === 'debt';
+  const isMultipleDebtPayment = type === 'debt_all';
   
   // Estimate units based on amount (for display purposes)
   // In a real app, this would come from the API
-  const estimatedUnits = !isDebtPayment && displayData.amount 
+  const estimatedUnits = !isDebtPayment && !isMultipleDebtPayment && displayData.amount 
     ? (parseFloat((displayData.amount || 0).toString()) / 0.45).toFixed(1) 
     : "0.0";
   
@@ -61,9 +62,11 @@ const SuccessScreen = () => {
         </div>
         <h2 className="text-xl font-semibold mb-2">Payment Successful!</h2>
         <p className="text-gray-500 mb-6">
-          {isDebtPayment 
-            ? "Your debt has been paid successfully" 
-            : "Your meter has been recharged successfully"}
+          {isMultipleDebtPayment
+            ? "All your pending debts have been paid successfully"
+            : isDebtPayment 
+              ? "Your debt has been paid successfully" 
+              : "Your meter has been recharged successfully"}
         </p>
         
         <Card className="mb-6 mx-auto max-w-xs">
@@ -103,13 +106,17 @@ const SuccessScreen = () => {
           </div>
         )}
         
-        {isDebtPayment && (
+        {(isDebtPayment || isMultipleDebtPayment) && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <CheckCircleIcon className="h-5 w-5 text-green-600" />
-              <h3 className="font-semibold">Debt Cleared</h3>
+              <h3 className="font-semibold">{isMultipleDebtPayment ? "All Debts Cleared" : "Debt Cleared"}</h3>
             </div>
-            <p className="text-sm text-gray-600">Thank you for your payment. Your debt has been successfully cleared and your account is up to date.</p>
+            <p className="text-sm text-gray-600">
+              {isMultipleDebtPayment
+                ? "Thank you for your payment. All your pending debts have been successfully cleared and your accounts are up to date."
+                : "Thank you for your payment. Your debt has been successfully cleared and your account is up to date."}
+            </p>
           </div>
         )}
         

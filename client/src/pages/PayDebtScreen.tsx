@@ -285,10 +285,10 @@ const PayDebtScreen = () => {
               </div>
               <div>
                 <h3 className="font-medium mb-1">Outstanding Balance</h3>
-                <p className="text-2xl font-bold mb-1">{formatCurrency(debt.amount)}</p>
-                <p className="text-sm text-gray-600">Due by {formatDate(debt.dueDate)}</p>
-                <p className="text-sm text-gray-600 mt-2">Meter: {debt.meterNumber}</p>
-                {debt.description && (
+                <p className="text-2xl font-bold mb-1">{debt && formatCurrency(debt.amount)}</p>
+                <p className="text-sm text-gray-600">Due by {debt && formatDate(debt.dueDate)}</p>
+                <p className="text-sm text-gray-600 mt-2">Meter: {debt?.meterNumber}</p>
+                {debt?.description && (
                   <p className="text-sm mt-2 text-gray-700">{debt.description}</p>
                 )}
               </div>
@@ -366,7 +366,7 @@ const PayDebtScreen = () => {
             ) : (
               <>Pay Now {isPayAll 
                 ? formatCurrency(payAllAmount) 
-                : formatCurrency(debt.amount)}</>
+                : debt ? formatCurrency(debt.amount) : ""}</>
             )}
           </Button>
         </CardFooter>
