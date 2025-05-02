@@ -89,75 +89,103 @@ const DashboardScreen = () => {
   return (
     <div className="slide-in px-4 pt-4 pb-8">
       {/* Welcome Card */}
-      <Card className="mb-4 bg-gradient-to-br from-primary to-primary-dark text-white">
-        <CardContent className="p-5">
-          <h2 className="text-lg font-semibold mb-1">Welcome{userProfile?.fullName ? `, ${userProfile.fullName.split(' ')[0]}` : ''}</h2>
-          <p className="text-sm text-white/80 mb-4">What would you like to do today?</p>
-          
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              className="bg-white/20 hover:bg-white/30 text-white border-0"
-              onClick={() => navigate('/recharge')}
-            >
-              Quick Recharge
-            </Button>
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              className="bg-white/20 hover:bg-white/30 text-white border-0"
-              onClick={() => navigate('/wallet')}
-            >
-              View Wallet
-            </Button>
-            {pendingDebtsCount > 0 && (
+      <Card className="mb-5 overflow-hidden card-shadow border-0">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600"></div>
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] bg-[length:20px_20px]"></div>
+          <CardContent className="p-6 relative text-white">
+            <h2 className="text-xl font-semibold mb-1">Welcome{userProfile?.fullName ? `, ${userProfile.fullName.split(' ')[0]}` : ''}!</h2>
+            <p className="text-sm text-white/90 mb-5">What would you like to do today?</p>
+            
+            <div className="flex flex-wrap gap-2">
               <Button 
                 variant="secondary" 
                 size="sm" 
-                className="bg-white/20 hover:bg-white/30 text-white border-0"
-                onClick={() => navigate('/debts')}
+                className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                onClick={() => navigate('/recharge')}
               >
-                Pay Debts ({pendingDebtsCount})
+                <LightbulbIcon className="h-4 w-4 mr-2" />
+                Quick Recharge
               </Button>
-            )}
-          </div>
-        </CardContent>
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                onClick={() => navigate('/wallet')}
+              >
+                <WalletIcon className="h-4 w-4 mr-2" />
+                View Wallet
+              </Button>
+              {pendingDebtsCount > 0 && (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="bg-white/20 hover:bg-white/30 text-white border-0 shadow-sm hover:shadow-md transition-all"
+                  onClick={() => navigate('/debts')}
+                >
+                  <AlertTriangleIcon className="h-4 w-4 mr-2" />
+                  Pay Debts ({pendingDebtsCount})
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </div>
       </Card>
       
       {/* Quick Actions & Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <Card className="col-span-1">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-500 mb-1">Wallet Balance</p>
-            <p className="text-xl font-semibold">{formatCurrency(walletBalance)}</p>
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        <Card className="col-span-1 border-0 card-shadow overflow-hidden">
+          <div className="h-1 bg-green-500"></div>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <WalletIcon className="h-4 w-4 text-green-600" />
+              <p className="text-sm font-medium text-gray-700">Wallet Balance</p>
+            </div>
+            <p className="text-2xl font-semibold text-gradient mb-1">{formatCurrency(walletBalance)}</p>
             <div className="mt-3">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full"
+                className="w-full border-green-100 text-green-600 hover:bg-green-50"
                 onClick={() => navigate('/wallet')}
               >
-                <WalletIcon className="h-4 w-4 mr-2" />
+                <PlusCircleIcon className="h-4 w-4 mr-2" />
                 Top Up
               </Button>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="col-span-1">
-          <CardContent className="p-4">
-            <p className="text-sm text-gray-500 mb-1">Pending Debts</p>
-            <p className="text-xl font-semibold">{pendingDebtsCount}</p>
+        <Card className="col-span-1 border-0 card-shadow overflow-hidden">
+          <div className="h-1 bg-amber-500"></div>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangleIcon className="h-4 w-4 text-amber-600" />
+              <p className="text-sm font-medium text-gray-700">Pending Debts</p>
+            </div>
+            <p className="text-2xl font-semibold mb-1">
+              <span className={pendingDebtsCount > 0 ? "text-amber-600" : "text-gray-600"}>
+                {pendingDebtsCount}
+              </span>
+            </p>
             <div className="mt-3">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full"
+                className={`w-full ${pendingDebtsCount > 0 ? "border-amber-100 text-amber-600 hover:bg-amber-50" : "border-gray-200"}`}
                 onClick={() => navigate('/debts')}
               >
-                <AlertTriangleIcon className="h-4 w-4 mr-2" />
-                View Debts
+                {pendingDebtsCount > 0 ? (
+                  <>
+                    <CreditCardIcon className="h-4 w-4 mr-2" />
+                    Pay Now
+                  </>
+                ) : (
+                  <>
+                    <BadgeCheckIcon className="h-4 w-4 mr-2" />
+                    No Debts
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
@@ -282,27 +310,34 @@ const DashboardScreen = () => {
       </Card>
       
       {/* Client Information */}
-      <Card className="mb-4">
+      <Card className="mb-4 border-0 card-shadow overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-blue-600 to-primary"></div>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">Client Information</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+            <CardTitle className="text-lg text-gradient">Client Information</CardTitle>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/profile')}
+              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+            >
+              <UserCogIcon className="h-4 w-4 mr-1" />
               Edit Profile
             </Button>
           </div>
-          <CardDescription>Your account details</CardDescription>
+          <CardDescription>Your personal account details</CardDescription>
         </CardHeader>
         
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-              <div className="mr-4 bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center">
-                <span className="font-medium text-primary">
+        <CardContent className="p-5">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-100 card-shadow">
+              <Avatar className="h-12 w-12 mr-4 border-2 border-primary/10">
+                <AvatarFallback className="bg-gradient-to-r from-primary to-blue-600 text-white font-medium">
                   {userProfile?.fullName ? userProfile.fullName.charAt(0).toUpperCase() : 'U'}
-                </span>
-              </div>
+                </AvatarFallback>
+              </Avatar>
               <div>
-                <h3 className="font-medium">
+                <h3 className="font-medium text-gray-800">
                   {userProfile?.fullName || 'Update your profile'}
                 </h3>
                 <p className="text-sm text-gray-500">
@@ -312,25 +347,34 @@ const DashboardScreen = () => {
             </div>
             
             {userProfile?.address && (
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 mb-1">Address</p>
-                <p className="text-sm">{userProfile.address}</p>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 card-shadow">
+                <div className="flex gap-2 items-center mb-2">
+                  <MapPinIcon className="h-4 w-4 text-primary/80"/>
+                  <p className="text-sm font-medium text-gray-700">Address</p>
+                </div>
+                <p className="text-sm pl-6">{userProfile.address}</p>
               </div>
             )}
             
             {userProfile?.phone && (
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 mb-1">Phone Number</p>
-                <p className="text-sm">{userProfile.phone}</p>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 card-shadow">
+                <div className="flex gap-2 items-center mb-2">
+                  <PhoneIcon className="h-4 w-4 text-primary/80"/>
+                  <p className="text-sm font-medium text-gray-700">Phone Number</p>
+                </div>
+                <p className="text-sm pl-6">{userProfile.phone}</p>
               </div>
             )}
             
             {!userProfile?.fullName && !userProfile?.address && !userProfile?.phone && (
-              <div className="text-center p-2">
+              <div className="text-center p-4 bg-primary/5 rounded-xl border border-primary/10">
+                <UserCogIcon className="h-6 w-6 text-primary/60 mx-auto mb-2" />
+                <p className="text-sm text-gray-600 mb-3">Complete your profile to access all features</p>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/profile')}
+                  className="border-primary/20 text-primary hover:bg-primary/5"
                 >
                   Complete Your Profile
                 </Button>
@@ -341,19 +385,23 @@ const DashboardScreen = () => {
       </Card>
 
       {/* Monthly Stats */}
-      <Card className="mb-4">
+      <Card className="mb-4 border-0 card-shadow overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-primary to-blue-600"></div>
         <CardHeader className="pb-0">
-          <CardTitle className="text-lg">Monthly Stats</CardTitle>
-          <CardDescription>Your electricity usage this month</CardDescription>
+          <CardTitle className="text-lg text-gradient">Monthly Statistics</CardTitle>
+          <CardDescription>Your electricity consumption overview</CardDescription>
         </CardHeader>
         
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-gray-500 text-sm">Total Spent</p>
-              <p className="text-xl font-semibold">
+        <CardContent className="p-5">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 card-shadow">
+              <div className="flex items-center gap-2 mb-1">
+                <CreditCardIcon className="h-4 w-4 text-primary" />
+                <p className="text-gray-600 text-sm font-medium">Total Spent</p>
+              </div>
+              <p className="text-2xl font-semibold text-gradient">
                 {isStatsLoading ? (
-                  "Loading..."
+                  <span className="text-gray-400 text-lg">Loading...</span>
                 ) : stats ? (
                   formatCurrency(stats.totalSpent)
                 ) : (
@@ -361,11 +409,14 @@ const DashboardScreen = () => {
                 )}
               </p>
             </div>
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-gray-500 text-sm">Transactions</p>
-              <p className="text-xl font-semibold">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 card-shadow">
+              <div className="flex items-center gap-2 mb-1">
+                <ReceiptIcon className="h-4 w-4 text-primary" />
+                <p className="text-gray-600 text-sm font-medium">Transactions</p>
+              </div>
+              <p className="text-2xl font-semibold text-gradient">
                 {isStatsLoading ? (
-                  "Loading..."
+                  <span className="text-gray-400 text-lg">Loading...</span>
                 ) : stats ? (
                   stats.transactionCount
                 ) : (
