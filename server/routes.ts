@@ -5,8 +5,12 @@ import { z } from "zod";
 import { 
   insertMeterSchema, 
   insertTransactionSchema, 
+  insertDebtSchema,
+  insertWalletTransactionSchema,
   meters, 
-  transactions 
+  transactions,
+  debts,
+  walletTransactions 
 } from "@shared/schema";
 import { generateToken } from "../client/src/lib/utils";
 
@@ -23,6 +27,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching recent meters:', error);
       res.status(500).json({ error: 'Failed to fetch recent meters' });
+    }
+  });
+
+  // Get all meters
+  app.get('/api/meters', async (req, res) => {
+    try {
+      const allMeters = await storage.getAllMeters();
+      res.json(allMeters);
+    } catch (error) {
+      console.error('Error fetching all meters:', error);
+      res.status(500).json({ error: 'Failed to fetch all meters' });
     }
   });
 
@@ -46,7 +61,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new meter
   app.post('/api/meters', async (req, res) => {
     try {
-      const validatedData = insertMeterSchema.parse(req.body);
+      const userData = await storage.getUserProfile();
+      const validatedData = insertMeterSchema.parse({
+        ...req.body,
+        userId: userData.id
+      });
       
       // Check if meter already exists
       const existingMeter = await storage.getMeterByNumber(validatedData.meterNumber);
@@ -76,11 +95,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update meter
+  app.put('/api/meters/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updatedMeter = await storage.updateMeter(parseInt(id), req.body);
+      res.json(updatedMeter);
+    } catch (error) {
+      console.error('Error updating meter:', error);
+      res.status(500).json({ error: 'Failed to update meter' });
+    }
+  });
+
   // Get all transactions with optional filtering
   app.get('/api/transactions', async (req, res) => {
     try {
       const status = req.query.status as string | undefined;
-      const transactions = await storage.getTransactions(status);
+      const type = req.query.type as string | undefined;
+      const transactions = await storage.getTransactions(status, type);
       res.json(transactions);
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -119,10 +151,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new transaction
   app.post('/api/transactions', async (req, res) => {
     try {
+      const userData = await storage.getUserProfile();
+      const paymentMethod = req.body.paymentMethod;
+      let walletUpdate = null;
+      
+      // If payment method is wallet, check if the user has enough balance
+      if (paymentMethod === 'wallet') {
+        const user = await storage.getUserProfile();
+        const walletBalance = parseFloat(user.walletBalance.toString());
+        const amount = parseFloat(req.body.total.toString());
+        
+        if (walletBalance < amount) {
+          return res.status(400).json({ error: 'Insufficient wallet balance' });
+        }
+        
+        // Create wallet transaction record for payment
+        const walletTransaction = await storage.createWalletTransaction({
+          userId: userData.id,
+          amount: req.body.total,
+          type: 'payment',
+          description: `Meter recharge - ${req.body.meterNumber}`,
+          reference: 'PAY' + Math.floor(Math.random() * 1000000)
+        });
+        
+        // Update user's wallet balance
+        walletUpdate = await storage.updateWalletBalance(userData.id, -parseFloat(req.body.total.toString()));
+      }
+      
+      // Calculate estimated units (for demo purposes)
+      const amount = parseFloat(req.body.amount.toString());
+      const units = (amount / 0.45).toFixed(2);
+      
       const transactionData = {
         ...req.body,
+        userId: userData.id,
         status: Math.random() < 0.9 ? "success" : "failed", // 90% success rate for demo
-        token: generateToken(),
+        token: generateToken(20),
+        units,
+        transactionType: "recharge"
       };
       
       const validatedData = insertTransactionSchema.parse(transactionData);
@@ -151,7 +217,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mock user profile endpoint
+  // Get debts for a user
+  app.get('/api/debts', async (req, res) => {
+    try {
+      const userData = await storage.getUserProfile();
+      const userDebts = await storage.getUserDebts(userData.id);
+      res.json(userDebts);
+    } catch (error) {
+      console.error('Error fetching user debts:', error);
+      res.status(500).json({ error: 'Failed to fetch user debts' });
+    }
+  });
+
+  // Pay debt
+  app.post('/api/debts/:id/pay', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userData = await storage.getUserProfile();
+      const debt = await storage.getDebtById(parseInt(id));
+      
+      if (!debt) {
+        return res.status(404).json({ error: 'Debt not found' });
+      }
+      
+      const paymentMethod = req.body.paymentMethod;
+      
+      // If payment method is wallet, check if the user has enough balance
+      if (paymentMethod === 'wallet') {
+        const walletBalance = parseFloat(userData.walletBalance.toString());
+        const amount = parseFloat(debt.amount.toString());
+        
+        if (walletBalance < amount) {
+          return res.status(400).json({ error: 'Insufficient wallet balance' });
+        }
+        
+        // Create wallet transaction for debt payment
+        await storage.createWalletTransaction({
+          userId: userData.id,
+          amount: debt.amount,
+          type: 'payment',
+          description: `Debt payment - ${debt.meterNumber}`,
+          reference: 'DEBT' + Math.floor(Math.random() * 1000000)
+        });
+        
+        // Update user's wallet balance
+        await storage.updateWalletBalance(userData.id, -parseFloat(debt.amount.toString()));
+      }
+      
+      // Create a transaction record for the debt payment
+      const transactionData = {
+        userId: userData.id,
+        meterNumber: debt.meterNumber,
+        amount: debt.amount,
+        total: debt.amount,
+        status: "success",
+        paymentMethod,
+        transactionType: "debt_payment"
+      };
+      
+      await storage.createTransaction(transactionData);
+      
+      // Mark debt as paid
+      const paidDebt = await storage.markDebtAsPaid(parseInt(id));
+      
+      res.json(paidDebt);
+    } catch (error) {
+      console.error('Error paying debt:', error);
+      res.status(500).json({ error: 'Failed to pay debt' });
+    }
+  });
+
+  // Get wallet balance
+  app.get('/api/wallet', async (req, res) => {
+    try {
+      const userData = await storage.getUserProfile();
+      res.json({
+        balance: userData.walletBalance
+      });
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      res.status(500).json({ error: 'Failed to fetch wallet balance' });
+    }
+  });
+
+  // Get wallet transactions
+  app.get('/api/wallet/transactions', async (req, res) => {
+    try {
+      const userData = await storage.getUserProfile();
+      const transactions = await storage.getWalletTransactions(userData.id);
+      res.json(transactions);
+    } catch (error) {
+      console.error('Error fetching wallet transactions:', error);
+      res.status(500).json({ error: 'Failed to fetch wallet transactions' });
+    }
+  });
+
+  // Add funds to wallet
+  app.post('/api/wallet/add-funds', async (req, res) => {
+    try {
+      const userData = await storage.getUserProfile();
+      const { amount } = req.body;
+      
+      if (!amount || parseFloat(amount) <= 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+      }
+      
+      // Create wallet transaction for deposit
+      const walletTransaction = await storage.createWalletTransaction({
+        userId: userData.id,
+        amount,
+        type: 'deposit',
+        description: 'Wallet top-up',
+        reference: 'DEP' + Math.floor(Math.random() * 1000000)
+      });
+      
+      // Update user's wallet balance
+      const updatedUser = await storage.updateWalletBalance(userData.id, parseFloat(amount));
+      
+      res.json({
+        balance: updatedUser.walletBalance,
+        transaction: walletTransaction
+      });
+    } catch (error) {
+      console.error('Error adding funds to wallet:', error);
+      res.status(500).json({ error: 'Failed to add funds to wallet' });
+    }
+  });
+
+  // User profile endpoint
   app.get('/api/user/profile', async (req, res) => {
     try {
       const user = await storage.getUserProfile();
@@ -159,6 +352,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching user profile:', error);
       res.status(500).json({ error: 'Failed to fetch user profile' });
+    }
+  });
+
+  // Update user profile
+  app.put('/api/user/profile', async (req, res) => {
+    try {
+      const updatedUser = await storage.updateUserProfile(req.body);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ error: 'Failed to update user profile' });
     }
   });
 

@@ -1,11 +1,16 @@
 import { db } from "@db";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, and, or, isNull, ne } from "drizzle-orm";
 import { 
   users, 
   meters, 
   transactions, 
+  debts,
+  walletTransactions,
   InsertMeter, 
-  InsertTransaction 
+  InsertTransaction,
+  InsertDebt,
+  InsertWalletTransaction,
+  User
 } from "@shared/schema";
 
 export const storage = {
@@ -14,6 +19,12 @@ export const storage = {
     return db.query.meters.findMany({
       orderBy: desc(meters.updatedAt),
       limit
+    });
+  },
+  
+  async getAllMeters() {
+    return db.query.meters.findMany({
+      orderBy: desc(meters.updatedAt)
     });
   },
   
@@ -50,12 +61,34 @@ export const storage = {
       
     return result[0];
   },
+
+  async updateMeter(id: number, data: Partial<InsertMeter>) {
+    const result = await db.update(meters)
+      .set({ 
+        ...data,
+        updatedAt: new Date() 
+      })
+      .where(eq(meters.id, id))
+      .returning();
+      
+    return result[0];
+  },
   
   // Transaction operations
-  async getTransactions(status?: string) {
+  async getTransactions(status?: string, type?: string) {
+    let conditions = [];
+    
     if (status && status !== 'all') {
+      conditions.push(eq(transactions.status, status));
+    }
+    
+    if (type && type !== 'all') {
+      conditions.push(eq(transactions.transactionType, type));
+    }
+    
+    if (conditions.length > 0) {
       return db.query.transactions.findMany({
-        where: eq(transactions.status, status),
+        where: and(...conditions),
         orderBy: desc(transactions.createdAt)
       });
     }
@@ -110,13 +143,106 @@ export const storage = {
     };
   },
   
+  // Debt operations
+  async getUserDebts(userId: number) {
+    return db.query.debts.findMany({
+      where: and(
+        eq(debts.userId, userId),
+        eq(debts.isPaid, false)
+      ),
+      orderBy: desc(debts.createdAt)
+    });
+  },
+  
+  async getDebtById(id: number) {
+    return db.query.debts.findFirst({
+      where: eq(debts.id, id)
+    });
+  },
+  
+  async createDebt(data: InsertDebt) {
+    const result = await db.insert(debts).values({
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }).returning();
+    
+    return result[0];
+  },
+  
+  async markDebtAsPaid(id: number) {
+    const result = await db.update(debts)
+      .set({ 
+        isPaid: true, 
+        status: 'paid',
+        updatedAt: new Date() 
+      })
+      .where(eq(debts.id, id))
+      .returning();
+      
+    return result[0];
+  },
+  
+  // Wallet operations
+  async getWalletTransactions(userId: number) {
+    return db.query.walletTransactions.findMany({
+      where: eq(walletTransactions.userId, userId),
+      orderBy: desc(walletTransactions.createdAt)
+    });
+  },
+  
+  async createWalletTransaction(data: InsertWalletTransaction) {
+    const result = await db.insert(walletTransactions).values({
+      ...data,
+      createdAt: new Date()
+    }).returning();
+    
+    return result[0];
+  },
+  
+  async updateWalletBalance(userId: number, amountChange: number) {
+    // Get current user data
+    const userData = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
+    
+    if (!userData) {
+      throw new Error('User not found');
+    }
+    
+    // Calculate new balance
+    const currentBalance = parseFloat(userData.walletBalance.toString());
+    const newBalance = currentBalance + amountChange;
+    
+    // Update user's wallet balance
+    const result = await db.update(users)
+      .set({ walletBalance: newBalance.toString() })
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return result[0];
+  },
+  
   // User operations
   async getUserProfile() {
     // In a real app, we'd get this from the session
-    // For now, return a mock user profile
-    return {
-      id: 1,
-      username: "demo_user",
-    };
+    // For now, query the first user
+    const user = await db.query.users.findFirst();
+    if (!user) {
+      throw new Error('No user found');
+    }
+    return user;
+  },
+  
+  async updateUserProfile(data: Partial<User>) {
+    // In a real app, we'd get the user ID from the session
+    const userId = 1;
+    
+    const result = await db.update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+      
+    return result[0];
   }
 };
