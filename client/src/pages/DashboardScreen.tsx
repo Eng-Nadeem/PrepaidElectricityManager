@@ -6,11 +6,18 @@ import {
   AlertTriangleIcon, 
   LightbulbIcon,
   ReceiptIcon,
-  ArrowRightCircleIcon
+  ArrowRightCircleIcon,
+  MapPinIcon,
+  PhoneIcon,
+  UserCogIcon,
+  CreditCardIcon,
+  BellIcon,
+  BadgeCheckIcon
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MeterCard from "@/components/MeterCard";
 import TransactionCard from "@/components/TransactionCard";
 import { formatCurrency } from "@/lib/utils";
@@ -33,13 +40,13 @@ const QuickActionButton = ({
 }: QuickActionButtonProps) => (
   <button 
     onClick={onClick}
-    className="flex items-center p-3 rounded-lg border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-colors"
+    className="flex items-center p-4 rounded-xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 card-shadow hover:shadow-md"
   >
-    <div className={`h-12 w-12 ${color} rounded-lg flex items-center justify-center mr-3`}>
+    <div className={`h-14 w-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mr-4 shadow-sm`}>
       {icon}
     </div>
     <div className="text-left">
-      <h3 className="font-medium text-sm">{title}</h3>
+      <h3 className="font-medium text-sm mb-1">{title}</h3>
       <p className="text-xs text-gray-500">{description}</p>
     </div>
   </button>

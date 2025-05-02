@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,30 +10,34 @@
   }
 
   body {
-    @apply font-sans antialiased bg-gray-100 text-foreground;
+    @apply font-sans antialiased bg-gray-50 text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
   }
 
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;  /* #2563eb - blue-600 */
+    --primary: 224 76.3% 48%;  /* Updated blue - more vibrant */
     --primary-foreground: 210 40% 98%;
-    --secondary: 187.5 72.7% 26.1%; /* #0f766e - teal-700 */
+    --secondary: 187.5 72.7% 26.1%; /* teal-700 */
     --secondary-foreground: 210 40% 98%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --accent: 217.9 91.2% 59.8%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --ring: 224 76.3% 48%;
+    --radius: 0.75rem;
   }
  
   .dark {
@@ -57,6 +63,49 @@
   }
 }
 
+@layer components {
+  .card-shadow {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  }
+  
+  .card-shadow:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05), 0 6px 6px rgba(0,0,0,0.1);
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600;
+  }
+  
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary to-blue-600 text-white hover:opacity-90;
+  }
+  
+  .glass-effect {
+    @apply bg-white/75 backdrop-blur-sm;
+  }
+  
+  .meter-card {
+    @apply card-shadow rounded-xl p-5 bg-white border border-gray-100 overflow-hidden;
+  }
+  
+  .status-badge {
+    @apply text-xs font-medium px-2 py-1 rounded-full inline-flex items-center gap-1;
+  }
+  
+  .status-active {
+    @apply bg-green-50 text-green-600;
+  }
+  
+  .status-pending {
+    @apply bg-amber-50 text-amber-600;
+  }
+  
+  .status-error {
+    @apply bg-red-50 text-red-600;
+  }
+}
+
 @layer utilities {
   .slide-in {
     animation: slideIn 0.3s ease-out forwards;
@@ -76,5 +125,24 @@
     20%, 80% { transform: translate3d(2px, 0, 0); }
     30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
     40%, 60% { transform: translate3d(4px, 0, 0); }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
 }
