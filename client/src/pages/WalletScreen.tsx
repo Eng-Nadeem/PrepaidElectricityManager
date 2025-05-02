@@ -47,25 +47,27 @@ const WalletTransactionItem = ({ transaction }: { transaction: WalletTransaction
   const isDeposit = transaction.type === "deposit";
   
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-center justify-between py-4 border-b border-gray-100 last:border-0 transition-all hover:bg-gray-50/50 px-2 rounded-lg">
       <div className="flex items-center">
-        <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-3 ${
-          isDeposit ? "bg-green-100" : "bg-primary-100"
+        <div className={`h-10 w-10 rounded-full flex items-center justify-center mr-3 shadow-sm ${
+          isDeposit 
+            ? "bg-gradient-to-br from-green-100 to-green-50" 
+            : "bg-gradient-to-br from-blue-100 to-blue-50"
         }`}>
           {isDeposit ? (
-            <ArrowDownIcon className="h-4 w-4 text-green-600" />
+            <ArrowDownIcon className="h-5 w-5 text-green-600" />
           ) : (
-            <ArrowUpIcon className="h-4 w-4 text-primary" />
+            <ArrowUpIcon className="h-5 w-5 text-blue-600" />
           )}
         </div>
         <div>
-          <p className="font-medium text-sm">
-            {transaction.description || (isDeposit ? "Deposit" : "Payment")}
+          <p className="font-medium text-sm text-gray-900">
+            {transaction.description || (isDeposit ? "Wallet Deposit" : "Payment")}
           </p>
-          <p className="text-xs text-gray-500">{formatDate(transaction.createdAt)}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{formatDate(transaction.createdAt)}</p>
         </div>
       </div>
-      <div className={`font-semibold ${isDeposit ? "text-green-600" : ""}`}>
+      <div className={`font-semibold ${isDeposit ? "text-green-600" : "text-blue-600"}`}>
         {isDeposit ? "+" : "-"}{formatCurrency(transaction.amount)}
       </div>
     </div>
@@ -195,44 +197,53 @@ const WalletScreen = () => {
       </Card>
       
       {/* Quick Actions */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors">
-          <CardContent className="p-3">
-            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
-              <ArrowUpIcon className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <Card className="text-center cursor-pointer card-shadow hover:shadow-md transition-all overflow-hidden border-0">
+          <div className="h-1 bg-gradient-to-r from-blue-500 to-primary"></div>
+          <CardContent className="p-4">
+            <div className="bg-gradient-to-br from-blue-100 to-blue-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+              <ArrowUpIcon className="h-5 w-5 text-blue-600" />
             </div>
-            <p className="text-xs font-medium">Send</p>
+            <p className="text-sm font-medium text-gray-800">Send</p>
           </CardContent>
         </Card>
         
-        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors">
-          <CardContent className="p-3">
-            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
-              <ArrowDownIcon className="h-5 w-5 text-primary" />
+        <Card className="text-center cursor-pointer card-shadow hover:shadow-md transition-all overflow-hidden border-0">
+          <div className="h-1 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+          <CardContent className="p-4">
+            <div className="bg-gradient-to-br from-green-100 to-green-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+              <ArrowDownIcon className="h-5 w-5 text-green-600" />
             </div>
-            <p className="text-xs font-medium">Receive</p>
+            <p className="text-sm font-medium text-gray-800">Receive</p>
           </CardContent>
         </Card>
         
-        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors"
+        <Card 
+          className="text-center cursor-pointer card-shadow hover:shadow-md transition-all overflow-hidden border-0"
           onClick={() => setIsTopUpOpen(true)}>
-          <CardContent className="p-3">
-            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
-              <PlusIcon className="h-5 w-5 text-primary" />
+          <div className="h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+          <CardContent className="p-4">
+            <div className="bg-gradient-to-br from-indigo-100 to-purple-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+              <PlusIcon className="h-5 w-5 text-indigo-600" />
             </div>
-            <p className="text-xs font-medium">Top Up</p>
+            <p className="text-sm font-medium text-gray-800">Top Up</p>
           </CardContent>
         </Card>
       </div>
       
       {/* Recent Transactions */}
-      <Card className="border-0 shadow-md">
+      <Card className="border-0 card-shadow overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+            <CardTitle className="text-lg text-gradient">
               Recent Transactions
             </CardTitle>
-            <Button variant="ghost" size="sm" className="flex items-center gap-1 text-primary">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex items-center gap-1 text-primary hover:text-primary/90 hover:bg-primary/5"
+            >
               <HistoryIcon className="h-4 w-4" />
               View All
             </Button>
@@ -240,28 +251,28 @@ const WalletScreen = () => {
           <CardDescription>Your recent wallet activity</CardDescription>
         </CardHeader>
         
-        <CardContent className="pb-2">
+        <CardContent className="pb-4 px-5">
           {isTransactionsLoading ? (
             <div className="py-8 flex flex-col items-center justify-center">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
-              <p className="text-sm text-gray-500">Loading transactions...</p>
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p className="text-sm text-gray-500">Loading your transactions...</p>
             </div>
           ) : walletTransactions && walletTransactions.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 custom-scrollbar">
               {walletTransactions.slice(0, 5).map((transaction) => (
                 <WalletTransactionItem key={transaction.id} transaction={transaction} />
               ))}
             </div>
           ) : (
-            <div className="py-10 text-center">
-              <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                <HistoryIcon className="h-8 w-8 text-gray-400" />
+            <div className="py-10 text-center bg-gray-50/50 rounded-xl border border-gray-100">
+              <div className="bg-gradient-to-br from-blue-100 to-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <HistoryIcon className="h-8 w-8 text-primary/70" />
               </div>
-              <p className="text-gray-600 font-medium mb-1">No Transactions Yet</p>
+              <p className="text-gray-700 font-medium mb-1">No Transactions Yet</p>
               <p className="text-gray-500 text-sm mb-4">Add funds to your wallet to get started</p>
               <Button 
                 onClick={() => setIsTopUpOpen(true)} 
-                variant="outline"
+                className="btn-gradient"
                 size="sm"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
@@ -274,9 +285,10 @@ const WalletScreen = () => {
       
       {/* Top Up Dialog */}
       <Dialog open={isTopUpOpen} onOpenChange={setIsTopUpOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader className="text-center">
-            <DialogTitle className="text-xl bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+        <DialogContent className="max-w-md overflow-hidden border-0 card-shadow-lg">
+          <div className="h-1 bg-gradient-to-r from-indigo-500 to-purple-600 absolute top-0 left-0 right-0"></div>
+          <DialogHeader className="text-center pt-6">
+            <DialogTitle className="text-xl text-gradient">
               Add Money to Wallet
             </DialogTitle>
             <DialogDescription>
@@ -291,7 +303,7 @@ const WalletScreen = () => {
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 pl-3 text-gray-500 text-xl font-bold">$</div>
                   <Input
                     {...form.register("amount")}
-                    className="pl-10 h-14 text-2xl font-bold text-center bg-gray-50 border-2 focus-visible:ring-primary"
+                    className="pl-10 h-14 text-2xl font-bold text-center bg-gray-50 border-2 focus-visible:ring-primary form-input-gradient rounded-xl"
                     placeholder="0.00"
                     type="number"
                     step="0.01"
@@ -301,7 +313,7 @@ const WalletScreen = () => {
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="h-8 px-2 text-primary"
+                      className="h-8 px-2 text-primary hover:bg-primary/5"
                       onClick={() => form.setValue("amount", "")}
                     >
                       Clear
@@ -309,14 +321,14 @@ const WalletScreen = () => {
                   </div>
                 </div>
                 {form.formState.errors.amount && (
-                  <p className="text-sm text-red-500 mt-1 text-center">
+                  <p className="text-sm text-red-500 mt-2 text-center">
                     {form.formState.errors.amount.message}
                   </p>
                 )}
               </div>
               
               <div className="space-y-5">
-                <p className="text-sm font-medium text-gray-500 text-center mb-2">Quick amounts</p>
+                <p className="text-sm font-medium text-gray-500 text-center mb-3">Quick amounts</p>
                 
                 <div className="grid grid-cols-3 gap-3">
                   {[10, 20, 50].map((amount) => (
@@ -325,10 +337,10 @@ const WalletScreen = () => {
                       type="button"
                       variant="outline"
                       size="lg"
-                      className={`h-16 text-lg font-medium rounded-xl ${
+                      className={`h-16 text-lg font-medium rounded-xl transition-all ${
                         form.watch("amount") === amount.toString()
-                          ? "border-primary bg-primary/5 text-primary"
-                          : ""
+                          ? "border-primary/70 bg-primary/5 text-primary shadow-sm"
+                          : "hover:border-primary/20 hover:bg-primary/5"
                       }`}
                       onClick={() => form.setValue("amount", amount.toString())}
                     >
@@ -344,10 +356,10 @@ const WalletScreen = () => {
                       type="button"
                       variant="outline"
                       size="lg"
-                      className={`h-16 text-lg font-medium rounded-xl ${
+                      className={`h-16 text-lg font-medium rounded-xl transition-all ${
                         form.watch("amount") === amount.toString()
-                          ? "border-primary bg-primary/5 text-primary"
-                          : ""
+                          ? "border-primary/70 bg-primary/5 text-primary shadow-sm"
+                          : "hover:border-primary/20 hover:bg-primary/5"
                       }`}
                       onClick={() => form.setValue("amount", amount.toString())}
                     >
@@ -357,9 +369,9 @@ const WalletScreen = () => {
                 </div>
               </div>
               
-              <div className="bg-primary/5 rounded-xl p-3 my-5 flex items-center">
-                <div className="bg-primary/10 rounded-full p-2 mr-3">
-                  <PlusIcon className="h-5 w-5 text-primary" />
+              <div className="bg-pattern-dots bg-primary/5 rounded-xl p-4 my-5 flex items-center">
+                <div className="bg-white/80 rounded-full p-2 mr-3 shadow-sm">
+                  <PlusIcon className="h-5 w-5 text-indigo-600" />
                 </div>
                 <div className="text-sm">
                   <p className="font-medium">Instant Credit</p>
@@ -373,7 +385,7 @@ const WalletScreen = () => {
                 type="submit" 
                 size="lg"
                 disabled={topUpMutation.isPending}
-                className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-700 text-white border-0"
+                className="w-full btn-gradient-purple rounded-xl h-12 text-base"
               >
                 {topUpMutation.isPending ? (
                   <div className="flex items-center justify-center">
@@ -390,7 +402,7 @@ const WalletScreen = () => {
                 variant="ghost"
                 onClick={() => setIsTopUpOpen(false)}
                 size="sm"
-                className="w-full text-gray-500"
+                className="w-full text-gray-500 hover:text-gray-700"
               >
                 Cancel
               </Button>
