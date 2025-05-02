@@ -138,9 +138,18 @@ export const storage = {
       
       const stats = successfulTransactionsResult[0];
       
+      // Ensure correct type conversion and default to 0 if NaN
+      const totalSpent = typeof stats.totalSpent === 'number' 
+        ? stats.totalSpent 
+        : parseFloat(stats.totalSpent?.toString() || '0') || 0;
+        
+      const count = typeof stats.transactionCount === 'number' 
+        ? stats.transactionCount 
+        : parseInt(stats.transactionCount?.toString() || '0') || 0;
+      
       return {
-        totalSpent: stats.totalSpent || 0,
-        transactionCount: parseInt(stats.transactionCount.toString()) || 0
+        totalSpent: totalSpent,
+        transactionCount: count
       };
     } catch (error) {
       console.error('Error calculating transaction stats:', error);

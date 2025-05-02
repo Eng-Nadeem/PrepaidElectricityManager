@@ -274,6 +274,65 @@ const DashboardScreen = () => {
         </CardFooter>
       </Card>
       
+      {/* Client Information */}
+      <Card className="mb-4">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg">Client Information</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+              Edit Profile
+            </Button>
+          </div>
+          <CardDescription>Your account details</CardDescription>
+        </CardHeader>
+        
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+              <div className="mr-4 bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center">
+                <span className="font-medium text-primary">
+                  {userProfile?.fullName ? userProfile.fullName.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-medium">
+                  {userProfile?.fullName || 'Update your profile'}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {userProfile?.email || userProfile?.username || 'No contact information'}
+                </p>
+              </div>
+            </div>
+            
+            {userProfile?.address && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500 mb-1">Address</p>
+                <p className="text-sm">{userProfile.address}</p>
+              </div>
+            )}
+            
+            {userProfile?.phoneNumber && (
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500 mb-1">Phone Number</p>
+                <p className="text-sm">{userProfile.phoneNumber}</p>
+              </div>
+            )}
+            
+            {!userProfile?.fullName && !userProfile?.address && !userProfile?.phoneNumber && (
+              <div className="text-center p-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                >
+                  Complete Your Profile
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Monthly Stats */}
       <Card className="mb-4">
         <CardHeader className="pb-0">

@@ -36,7 +36,7 @@ const getCategoryIcon = (category: string) => {
     case 'water':
       return <DropletIcon className="h-4 w-4 text-blue-500" />;
     case 'maintenance':
-      return <ToolIcon className="h-4 w-4 text-orange-500" />;
+      return <WrenchIcon className="h-4 w-4 text-orange-500" />;
     case 'trash':
       return <Trash2Icon className="h-4 w-4 text-green-500" />;
     case 'electricity':
@@ -132,6 +132,7 @@ const DebtsScreen = () => {
   const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("pending");
+  const { toast } = useToast();
   
   // Fetch debts
   const { data: debts, isLoading, refetch } = useQuery<Debt[]>({
@@ -190,7 +191,7 @@ const DebtsScreen = () => {
   return (
     <div className="slide-in px-4 pt-4 pb-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Electricity Debts</h2>
+        <h2 className="text-xl font-semibold">Utility Debts</h2>
         <Button 
           variant="ghost" 
           size="icon" 
@@ -212,6 +213,43 @@ const DebtsScreen = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+      
+      {/* Pay All Button (Show only when pending debts exist) */}
+      {pendingTotal > 0 && activeTab === 'pending' && (
+        <Card className="mb-4 bg-gradient-to-r from-primary-50 to-blue-50 border-primary/20">
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Clear All Debts</h3>
+                <p className="text-sm text-gray-500">Pay all pending utilities in one payment</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold">{formatCurrency(pendingTotal)}</p>
+                <Button 
+                  className="mt-2 bg-gradient-to-r from-primary to-indigo-600" 
+                  onClick={() => {
+                    // Get all the pending debts
+                    const pendingDebts = debts?.filter(debt => !debt.isPaid) || [];
+                    // Navigate to the pay all debts page
+                    if (pendingDebts.length > 0) {
+                      navigate(`/pay-debt?type=all&amount=${pendingTotal}`);
+                    } else {
+                      toast({
+                        title: "No pending debts",
+                        description: "You don't have any pending debts to pay",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  Pay All Debts
+                  <ArrowRightIcon className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-3 mb-4">
