@@ -141,49 +141,53 @@ const WalletScreen = () => {
   
   return (
     <div className="slide-in px-4 pt-4 pb-8">
-      <h2 className="text-xl font-semibold mb-4">My Wallet</h2>
+      <h2 className="text-xl font-semibold mb-5 text-gradient">My Wallet</h2>
       
       {/* Wallet Balance Card */}
-      <Card className="overflow-hidden mb-6 border-0 shadow-lg">
-        <div className="bg-gradient-to-r from-primary to-indigo-600 px-6 pt-6 pb-12 text-white relative">
+      <Card className="overflow-hidden mb-6 border-0 card-shadow-lg">
+        <div className="bg-gradient-to-r from-primary to-indigo-600 px-6 pt-6 pb-12 text-white relative bg-pattern-dots">
           <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
           <div className="absolute -bottom-5 -left-10 w-24 h-24 bg-white/5 rounded-full"></div>
+          <div className="absolute top-2 right-2 w-16 h-16 rounded-full bg-white/10"></div>
+          <div className="absolute top-10 right-10 w-8 h-8 rounded-full bg-white/10"></div>
           
-          <h3 className="text-lg font-medium text-white/90 mb-1">Available Balance</h3>
-          <div className="text-4xl font-bold mb-2">
-            {isWalletLoading ? (
-              <div className="h-10 w-32 bg-white/20 animate-pulse rounded-md"></div>
-            ) : (
-              formatCurrency(walletData?.balance || 0)
-            )}
-          </div>
-          
-          <div className="flex text-white/80 text-sm">
-            <span>PowerPay Wallet</span>
-            <span className="mx-2">•</span>
-            <span>Updated just now</span>
+          <div className="relative z-10">
+            <h3 className="text-lg font-medium text-white/90 mb-1">Available Balance</h3>
+            <div className="text-4xl font-bold mb-2">
+              {isWalletLoading ? (
+                <div className="h-10 w-32 bg-white/20 animate-pulse rounded-md"></div>
+              ) : (
+                formatCurrency(walletData?.balance || 0)
+              )}
+            </div>
+            
+            <div className="flex text-white/80 text-sm">
+              <span>PowerPay Wallet</span>
+              <span className="mx-2">•</span>
+              <span>Updated just now</span>
+            </div>
           </div>
         </div>
         
-        <div className="bg-white px-6 py-4 flex justify-between -mt-4 rounded-t-2xl relative z-10">
+        <div className="bg-white px-6 py-4 flex justify-between -mt-4 rounded-t-2xl relative z-10 shadow-sm">
           <Button 
             onClick={() => setIsTopUpOpen(true)} 
-            className="gap-1 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-700 text-white border-0"
+            className="gap-1 btn-gradient"
           >
             <PlusIcon className="h-4 w-4" />
             Add Money
           </Button>
           
           {!isWalletLoading && (
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <div className="text-center">
-                <p className="text-xs text-gray-500">Total Added</p>
+                <p className="text-xs text-gray-500 font-medium mb-1">Total Added</p>
                 <p className="font-semibold text-green-600">{formatCurrency(totalDeposits)}</p>
               </div>
               
               <div className="text-center">
-                <p className="text-xs text-gray-500">Total Spent</p>
-                <p className="font-semibold text-gray-700">{formatCurrency(totalSpent)}</p>
+                <p className="text-xs text-gray-500 font-medium mb-1">Total Spent</p>
+                <p className="font-semibold text-red-600">{formatCurrency(totalSpent)}</p>
               </div>
             </div>
           )}
