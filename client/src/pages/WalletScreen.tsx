@@ -78,7 +78,7 @@ const WalletScreen = () => {
   const queryClient = useQueryClient();
   
   // Fetch wallet balance
-  const { data: walletData, isLoading: isWalletLoading } = useQuery({
+  const { data: walletData, isLoading: isWalletLoading } = useQuery<{ balance: number }>({
     queryKey: ['/api/wallet'],
   });
   

@@ -228,6 +228,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch user debts' });
     }
   });
+  
+  // Get debt by ID
+  app.get('/api/debts/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const debt = await storage.getDebtById(parseInt(id));
+      
+      if (!debt) {
+        return res.status(404).json({ error: 'Debt not found' });
+      }
+      
+      res.json(debt);
+    } catch (error) {
+      console.error('Error fetching debt:', error);
+      res.status(500).json({ error: 'Failed to fetch debt' });
+    }
+  });
 
   // Pay debt
   app.post('/api/debts/:id/pay', async (req, res) => {

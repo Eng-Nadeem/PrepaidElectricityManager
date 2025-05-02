@@ -127,20 +127,28 @@ export const storage = {
   },
   
   async getTransactionStats() {
-    // Get successful transactions total amount and count
-    const successfulTransactionsResult = await db.select({
-      totalSpent: sql<number>`sum(${transactions.amount})`,
-      transactionCount: sql<number>`count(*)`
-    })
-    .from(transactions)
-    .where(eq(transactions.status, 'success'));
-    
-    const stats = successfulTransactionsResult[0];
-    
-    return {
-      totalSpent: stats.totalSpent || 0,
-      transactionCount: stats.transactionCount || 0
-    };
+    try {
+      // Get successful transactions total amount and count
+      const successfulTransactionsResult = await db.select({
+        totalSpent: sql<number>`COALESCE(sum(${transactions.amount}), 0)`,
+        transactionCount: sql<number>`count(*)`
+      })
+      .from(transactions)
+      .where(eq(transactions.status, 'success'));
+      
+      const stats = successfulTransactionsResult[0];
+      
+      return {
+        totalSpent: stats.totalSpent || 0,
+        transactionCount: parseInt(stats.transactionCount.toString()) || 0
+      };
+    } catch (error) {
+      console.error('Error calculating transaction stats:', error);
+      return {
+        totalSpent: 0,
+        transactionCount: 0
+      };
+    }
   },
   
   // Debt operations
