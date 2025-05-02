@@ -36,18 +36,21 @@ const QuickActionButton = ({
   title, 
   description, 
   onClick, 
-  color = "bg-primary/10" 
+  color = "from-blue-100 to-indigo-50" 
 }: QuickActionButtonProps) => (
   <button 
     onClick={onClick}
-    className="flex items-center p-4 rounded-xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 card-shadow hover:shadow-md"
+    className="block w-full rounded-xl overflow-hidden border-0 hover:scale-[1.02] transition-all duration-300 card-shadow hover:shadow-md"
   >
-    <div className={`h-14 w-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mr-4 shadow-sm`}>
-      {icon}
-    </div>
-    <div className="text-left">
-      <h3 className="font-medium text-sm mb-1">{title}</h3>
-      <p className="text-xs text-gray-500">{description}</p>
+    <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-primary"></div>
+    <div className="flex items-center p-4 bg-gradient-to-br from-white to-gray-50">
+      <div className={`h-14 w-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center mr-4 shadow-sm border border-white/80`}>
+        {icon}
+      </div>
+      <div className="text-left">
+        <h3 className="font-medium text-sm mb-1 text-gradient">{title}</h3>
+        <p className="text-xs text-gray-500">{description}</p>
+      </div>
     </div>
   </button>
 );
@@ -229,15 +232,15 @@ const DashboardScreen = () => {
       
       {/* Quick Recharge */}
       <Card className="mb-5 border-0 card-shadow overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-indigo-600 to-primary"></div>
+        <div className="h-1.5 bg-gradient-to-r from-indigo-600 via-violet-600 to-primary"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg text-gradient">My Meters</CardTitle>
+            <CardTitle className="text-lg text-gradient-purple">My Meters</CardTitle>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/meters')}
-              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+              className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
             >
               View All
             </Button>
@@ -281,15 +284,15 @@ const DashboardScreen = () => {
       
       {/* Recent Transactions */}
       <Card className="mb-5 border-0 card-shadow overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+        <div className="h-1.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg text-gradient">Recent Transactions</CardTitle>
+            <CardTitle className="text-lg text-gradient-teal">Recent Transactions</CardTitle>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/history')}
-              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+              className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
             >
               View All
             </Button>
@@ -344,15 +347,15 @@ const DashboardScreen = () => {
       
       {/* Client Information */}
       <Card className="mb-4 border-0 card-shadow overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-blue-600 to-primary"></div>
+        <div className="h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-lg text-gradient">Client Information</CardTitle>
+            <CardTitle className="text-lg text-gradient-orange">Client Information</CardTitle>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/profile')}
-              className="text-primary hover:text-primary/90 hover:bg-primary/5"
+              className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
             >
               <UserCogIcon className="h-4 w-4 mr-1" />
               Edit Profile
@@ -419,20 +422,20 @@ const DashboardScreen = () => {
 
       {/* Monthly Stats */}
       <Card className="mb-4 border-0 card-shadow overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-primary to-blue-600"></div>
+        <div className="h-1.5 bg-gradient-to-r from-pink-500 via-rose-500 to-red-500"></div>
         <CardHeader className="pb-0">
-          <CardTitle className="text-lg text-gradient">Monthly Statistics</CardTitle>
+          <CardTitle className="text-lg text-gradient-pink">Monthly Statistics</CardTitle>
           <CardDescription>Your electricity consumption overview</CardDescription>
         </CardHeader>
         
         <CardContent className="p-5">
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 card-shadow">
+            <div className="bg-gradient-to-br from-white to-pink-50 p-4 rounded-lg border border-pink-100 card-shadow">
               <div className="flex items-center gap-2 mb-1">
-                <CreditCardIcon className="h-4 w-4 text-primary" />
-                <p className="text-gray-600 text-sm font-medium">Total Spent</p>
+                <CreditCardIcon className="h-4 w-4 text-pink-600" />
+                <p className="text-gray-700 text-sm font-medium">Total Spent</p>
               </div>
-              <p className="text-2xl font-semibold text-gradient">
+              <p className="text-2xl font-semibold text-gradient-pink">
                 {isStatsLoading ? (
                   <span className="text-gray-400 text-lg">Loading...</span>
                 ) : stats ? (
@@ -442,12 +445,12 @@ const DashboardScreen = () => {
                 )}
               </p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 card-shadow">
+            <div className="bg-gradient-to-br from-white to-pink-50 p-4 rounded-lg border border-pink-100 card-shadow">
               <div className="flex items-center gap-2 mb-1">
-                <ReceiptIcon className="h-4 w-4 text-primary" />
-                <p className="text-gray-600 text-sm font-medium">Transactions</p>
+                <ReceiptIcon className="h-4 w-4 text-pink-600" />
+                <p className="text-gray-700 text-sm font-medium">Transactions</p>
               </div>
-              <p className="text-2xl font-semibold text-gradient">
+              <p className="text-2xl font-semibold text-gradient-pink">
                 {isStatsLoading ? (
                   <span className="text-gray-400 text-lg">Loading...</span>
                 ) : stats ? (
