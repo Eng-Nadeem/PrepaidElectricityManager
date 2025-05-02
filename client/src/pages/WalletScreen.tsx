@@ -126,42 +126,109 @@ const WalletScreen = () => {
     topUpMutation.mutate(data);
   };
   
+  // Calculate stats from transactions
+  const totalDeposits = walletTransactions 
+    ? walletTransactions
+        .filter(t => t.type === 'deposit')
+        .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0)
+    : 0;
+    
+  const totalSpent = walletTransactions 
+    ? walletTransactions
+        .filter(t => t.type === 'payment')
+        .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0)
+    : 0;
+  
   return (
     <div className="slide-in px-4 pt-4 pb-8">
       <h2 className="text-xl font-semibold mb-4">My Wallet</h2>
       
       {/* Wallet Balance Card */}
-      <Card className="bg-gradient-to-r from-primary-50 to-blue-50 border-primary/20 mb-6">
-        <CardContent className="p-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Available Balance</p>
-              <h3 className="text-3xl font-bold mb-1">
-                {isWalletLoading ? (
-                  "Loading..."
-                ) : (
-                  formatCurrency(walletData?.balance || 0)
-                )}
-              </h3>
-              <p className="text-xs text-gray-500">Updated just now</p>
-            </div>
-            <Button 
-              onClick={() => setIsTopUpOpen(true)} 
-              className="flex items-center gap-1"
-            >
-              <PlusIcon className="h-4 w-4" />
-              Top Up
-            </Button>
+      <Card className="overflow-hidden mb-6 border-0 shadow-lg">
+        <div className="bg-gradient-to-r from-primary to-indigo-600 px-6 pt-6 pb-12 text-white relative">
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
+          <div className="absolute -bottom-5 -left-10 w-24 h-24 bg-white/5 rounded-full"></div>
+          
+          <h3 className="text-lg font-medium text-white/90 mb-1">Available Balance</h3>
+          <div className="text-4xl font-bold mb-2">
+            {isWalletLoading ? (
+              <div className="h-10 w-32 bg-white/20 animate-pulse rounded-md"></div>
+            ) : (
+              formatCurrency(walletData?.balance || 0)
+            )}
           </div>
-        </CardContent>
+          
+          <div className="flex text-white/80 text-sm">
+            <span>PowerPay Wallet</span>
+            <span className="mx-2">•</span>
+            <span>Updated just now</span>
+          </div>
+        </div>
+        
+        <div className="bg-white px-6 py-4 flex justify-between -mt-4 rounded-t-2xl relative z-10">
+          <Button 
+            onClick={() => setIsTopUpOpen(true)} 
+            className="gap-1 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-700 text-white border-0"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Add Money
+          </Button>
+          
+          {!isWalletLoading && (
+            <div className="flex gap-4">
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Total Added</p>
+                <p className="font-semibold text-green-600">{formatCurrency(totalDeposits)}</p>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Total Spent</p>
+                <p className="font-semibold text-gray-700">{formatCurrency(totalSpent)}</p>
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
       
+      {/* Quick Actions */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors">
+          <CardContent className="p-3">
+            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ArrowUpIcon className="h-5 w-5 text-primary" />
+            </div>
+            <p className="text-xs font-medium">Send</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors">
+          <CardContent className="p-3">
+            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ArrowDownIcon className="h-5 w-5 text-primary" />
+            </div>
+            <p className="text-xs font-medium">Receive</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="text-center cursor-pointer hover:border-primary/50 transition-colors"
+          onClick={() => setIsTopUpOpen(true)}>
+          <CardContent className="p-3">
+            <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+              <PlusIcon className="h-5 w-5 text-primary" />
+            </div>
+            <p className="text-xs font-medium">Top Up</p>
+          </CardContent>
+        </Card>
+      </div>
+      
       {/* Recent Transactions */}
-      <Card>
+      <Card className="border-0 shadow-md">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
-            <CardTitle>Recent Transactions</CardTitle>
-            <Button variant="ghost" size="sm" className="flex items-center gap-1">
+            <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+              Recent Transactions
+            </CardTitle>
+            <Button variant="ghost" size="sm" className="flex items-center gap-1 text-primary">
               <HistoryIcon className="h-4 w-4" />
               View All
             </Button>
@@ -171,7 +238,10 @@ const WalletScreen = () => {
         
         <CardContent className="pb-2">
           {isTransactionsLoading ? (
-            <div className="py-8 text-center">Loading transactions...</div>
+            <div className="py-8 flex flex-col items-center justify-center">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+              <p className="text-sm text-gray-500">Loading transactions...</p>
+            </div>
           ) : walletTransactions && walletTransactions.length > 0 ? (
             <div className="divide-y divide-gray-100">
               {walletTransactions.slice(0, 5).map((transaction) => (
@@ -179,8 +249,20 @@ const WalletScreen = () => {
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-gray-500">
-              No transactions yet
+            <div className="py-10 text-center">
+              <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+                <HistoryIcon className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-600 font-medium mb-1">No Transactions Yet</p>
+              <p className="text-gray-500 text-sm mb-4">Add funds to your wallet to get started</p>
+              <Button 
+                onClick={() => setIsTopUpOpen(true)} 
+                variant="outline"
+                size="sm"
+              >
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Top Up Now
+              </Button>
             </div>
           )}
         </CardContent>
@@ -188,46 +270,81 @@ const WalletScreen = () => {
       
       {/* Top Up Dialog */}
       <Dialog open={isTopUpOpen} onOpenChange={setIsTopUpOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Top Up Wallet</DialogTitle>
+        <DialogContent className="max-w-md">
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-xl bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+              Add Money to Wallet
+            </DialogTitle>
             <DialogDescription>
-              Add funds to your wallet for quick and easy electricity payments.
+              Top up your wallet for seamless electricity payments
             </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={form.handleSubmit(handleTopUp)}>
             <div className="py-4">
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Amount
-                </label>
+              <div className="mb-6">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 pl-3 text-gray-500 text-xl font-bold">$</div>
                   <Input
                     {...form.register("amount")}
-                    className="pl-8"
+                    className="pl-10 h-14 text-2xl font-bold text-center bg-gray-50 border-2 focus-visible:ring-primary"
                     placeholder="0.00"
                     type="number"
                     step="0.01"
                   />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      type="button"
+                      className="h-8 px-2 text-primary"
+                      onClick={() => form.setValue("amount", "")}
+                    >
+                      Clear
+                    </Button>
+                  </div>
                 </div>
                 {form.formState.errors.amount && (
-                  <p className="text-sm text-red-500 mt-1">
+                  <p className="text-sm text-red-500 mt-1 text-center">
                     {form.formState.errors.amount.message}
                   </p>
                 )}
               </div>
               
-              <div className="text-sm text-gray-500">
-                <p className="mb-1">Quick amounts:</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {[10, 20, 50, 100, 200, 500].map((amount) => (
+              <div className="space-y-5">
+                <p className="text-sm font-medium text-gray-500 text-center mb-2">Quick amounts</p>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {[10, 20, 50].map((amount) => (
                     <Button
                       key={amount}
                       type="button"
                       variant="outline"
-                      size="sm"
+                      size="lg"
+                      className={`h-16 text-lg font-medium rounded-xl ${
+                        form.watch("amount") === amount.toString()
+                          ? "border-primary bg-primary/5 text-primary"
+                          : ""
+                      }`}
+                      onClick={() => form.setValue("amount", amount.toString())}
+                    >
+                      ${amount}
+                    </Button>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {[100, 200, 500].map((amount) => (
+                    <Button
+                      key={amount}
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className={`h-16 text-lg font-medium rounded-xl ${
+                        form.watch("amount") === amount.toString()
+                          ? "border-primary bg-primary/5 text-primary"
+                          : ""
+                      }`}
                       onClick={() => form.setValue("amount", amount.toString())}
                     >
                       ${amount}
@@ -235,21 +352,43 @@ const WalletScreen = () => {
                   ))}
                 </div>
               </div>
+              
+              <div className="bg-primary/5 rounded-xl p-3 my-5 flex items-center">
+                <div className="bg-primary/10 rounded-full p-2 mr-3">
+                  <PlusIcon className="h-5 w-5 text-primary" />
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium">Instant Credit</p>
+                  <p className="text-gray-500">Funds are available immediately after top-up</p>
+                </div>
+              </div>
             </div>
             
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsTopUpOpen(false)}
-              >
-                Cancel
-              </Button>
+            <DialogFooter className="flex-col gap-2">
               <Button 
                 type="submit" 
+                size="lg"
                 disabled={topUpMutation.isPending}
+                className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-700 text-white border-0"
               >
-                {topUpMutation.isPending ? "Processing..." : "Top Up"}
+                {topUpMutation.isPending ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  `Add ${form.watch("amount") ? "$" + form.watch("amount") : "Money"} to Wallet`
+                )}
+              </Button>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsTopUpOpen(false)}
+                size="sm"
+                className="w-full text-gray-500"
+              >
+                Cancel
               </Button>
             </DialogFooter>
           </form>
