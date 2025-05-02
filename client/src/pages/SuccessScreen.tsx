@@ -49,7 +49,9 @@ const SuccessScreen = () => {
   
   // Estimate units based on amount (for display purposes)
   // In a real app, this would come from the API
-  const estimatedUnits = !isDebtPayment ? (parseFloat(displayData.amount.toString()) / 0.45).toFixed(1) : null;
+  const estimatedUnits = !isDebtPayment && displayData.amount 
+    ? (parseFloat((displayData.amount || 0).toString()) / 0.45).toFixed(1) 
+    : "0.0";
   
   return (
     <div className="slide-in h-full flex items-center justify-center">

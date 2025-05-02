@@ -6,10 +6,16 @@ import {
   ArrowRightIcon, 
   CheckCircleIcon, 
   ClockIcon, 
+  CreditCardIcon,
+  DropletIcon,
+  LightbulbIcon,
   RefreshCcwIcon,
-  SearchIcon
+  SearchIcon,
+  Trash2Icon,
+  WrenchIcon,
+  WalletIcon
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -18,18 +24,70 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Debt } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+
+// Category icon mapping
+const getCategoryIcon = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'water':
+      return <DropletIcon className="h-4 w-4 text-blue-500" />;
+    case 'maintenance':
+      return <ToolIcon className="h-4 w-4 text-orange-500" />;
+    case 'trash':
+      return <Trash2Icon className="h-4 w-4 text-green-500" />;
+    case 'electricity':
+    default:
+      return <LightbulbIcon className="h-4 w-4 text-amber-500" />;
+  }
+};
+
+// Category display text
+const getCategoryName = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'water': return 'Water';
+    case 'maintenance': return 'Maintenance';
+    case 'trash': return 'Trash Collection';
+    case 'electricity': return 'Electricity';
+    default: return category || 'Utility';
+  }
+};
+
+// Category badge styling
+const getCategoryStyle = (category: string) => {
+  switch (category?.toLowerCase()) {
+    case 'water': 
+      return 'bg-blue-50 text-blue-600 hover:bg-blue-100';
+    case 'maintenance': 
+      return 'bg-orange-50 text-orange-600 hover:bg-orange-100';
+    case 'trash': 
+      return 'bg-green-50 text-green-600 hover:bg-green-100';
+    case 'electricity':
+    default:
+      return 'bg-amber-50 text-amber-600 hover:bg-amber-100';
+  }
+};
 
 // Debt card component
 const DebtCard = ({ debt, onPayNow }: { debt: Debt, onPayNow: (debt: Debt) => void }) => {
+  const categoryName = getCategoryName(debt.category);
+  const categoryStyle = getCategoryStyle(debt.category);
+  
   return (
     <Card className="mb-3 overflow-hidden">
       <div className={`h-1 ${debt.isPaid ? 'bg-green-500' : 'bg-amber-500'}`} />
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
+          <div className="flex-1 pr-3">
+            <div className="flex items-center justify-between mb-2">
+              <Badge variant="outline" className={`flex items-center gap-1 ${categoryStyle}`}>
+                {getCategoryIcon(debt.category)}
+                {categoryName}
+              </Badge>
+              
               {debt.isPaid ? (
                 <span className="flex items-center text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded-full">
                   <CheckCircleIcon className="h-3 w-3 mr-1" />
@@ -41,19 +99,23 @@ const DebtCard = ({ debt, onPayNow }: { debt: Debt, onPayNow: (debt: Debt) => vo
                   {new Date(debt.dueDate) < new Date() ? 'Overdue' : 'Pending'}
                 </span>
               )}
-              <span className="text-sm text-gray-500">
-                Due: {formatDate(debt.dueDate)}
-              </span>
             </div>
-            <p className="text-sm mb-1">Meter: {debt.meterNumber}</p>
-            <p className="font-semibold mb-2">{formatCurrency(debt.amount)}</p>
-            <p className="text-sm text-gray-600">{debt.description}</p>
+            
+            <div className="flex justify-between mb-1">
+              <p className="text-sm font-medium">{debt.description || `${categoryName} Bill`}</p>
+              <p className="font-bold text-right">{formatCurrency(debt.amount)}</p>
+            </div>
+            
+            <div className="flex justify-between text-xs text-gray-500">
+              <p>Meter: {debt.meterNumber}</p>
+              <p>Due: {formatDate(debt.dueDate)}</p>
+            </div>
           </div>
           
           {!debt.isPaid && (
             <Button 
               size="sm" 
-              className="flex items-center"
+              className="flex items-center whitespace-nowrap"
               onClick={() => onPayNow(debt)}
             >
               Pay Now

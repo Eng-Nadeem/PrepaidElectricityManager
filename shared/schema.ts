@@ -94,6 +94,7 @@ export const debts = pgTable("debts", {
   userId: integer("user_id").references(() => users.id),
   meterNumber: text("meter_number").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  category: text("category").default("electricity").notNull(), // 'electricity', 'water', 'maintenance', 'trash', 'other'
   dueDate: timestamp("due_date").notNull(),
   description: text("description"),
   status: text("status").default("pending").notNull(),
@@ -106,6 +107,7 @@ export const insertDebtSchema = createInsertSchema(debts).pick({
   userId: true,
   meterNumber: true,
   amount: true,
+  category: true,
   dueDate: true,
   description: true,
   status: true,
