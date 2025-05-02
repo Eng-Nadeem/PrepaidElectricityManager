@@ -43,10 +43,22 @@ export function validateAmount(amount: string | number): boolean {
   return !isNaN(numericAmount) && numericAmount >= 5 && numericAmount <= 1000;
 }
 
-export function generateToken(): string {
-  const segments = [];
-  for (let i = 0; i < 4; i++) {
-    segments.push(Math.floor(1000 + Math.random() * 9000).toString());
+export function generateToken(length: number = 16): string {
+  if (length === 20) {
+    // For STS meter tokens, generate 20-digit code
+    let token = '';
+    for (let i = 0; i < 5; i++) {
+      token += Math.floor(1000 + Math.random() * 9000).toString();
+    }
+    
+    // Format the token with dashes every 4 digits for readability
+    return token.match(/.{1,4}/g)?.join('-') || token;
+  } else {
+    // Default token format
+    const segments = [];
+    for (let i = 0; i < 4; i++) {
+      segments.push(Math.floor(1000 + Math.random() * 9000).toString());
+    }
+    return segments.join('-');
   }
-  return segments.join('-');
 }
