@@ -91,18 +91,6 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-green-600;
   }
   
-  .text-gradient-orange {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-amber-600;
-  }
-  
-  .text-gradient-pink {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-500;
-  }
-  
-  .text-gradient-teal {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-500;
-  }
-  
   /* Button gradient styles */
   .btn-gradient {
     @apply bg-gradient-to-r from-primary to-blue-600 text-white hover:opacity-90 shadow-sm;
@@ -116,16 +104,8 @@
     @apply bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:opacity-90 shadow-sm;
   }
   
-  .btn-gradient-teal {
-    @apply bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:opacity-90 shadow-sm;
-  }
-  
   .btn-gradient-orange {
-    @apply bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:opacity-90 shadow-sm;
-  }
-  
-  .btn-gradient-pink {
-    @apply bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:opacity-90 shadow-sm;
+    @apply bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:opacity-90 shadow-sm;
   }
   
   /* Card and section gradient backgrounds */
@@ -139,18 +119,6 @@
   
   .bg-gradient-green {
     @apply bg-gradient-to-r from-green-600 to-emerald-500;
-  }
-  
-  .bg-gradient-teal {
-    @apply bg-gradient-to-r from-teal-500 to-cyan-500;
-  }
-  
-  .bg-gradient-orange {
-    @apply bg-gradient-to-r from-orange-500 to-amber-600;
-  }
-  
-  .bg-gradient-pink {
-    @apply bg-gradient-to-r from-pink-500 to-rose-500;
   }
   
   /* Background and Card Patterns */

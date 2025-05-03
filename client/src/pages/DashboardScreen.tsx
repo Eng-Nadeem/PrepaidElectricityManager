@@ -94,7 +94,7 @@ const DashboardScreen = () => {
       {/* Welcome Card */}
       <Card className="mb-5 overflow-hidden card-shadow-lg border-0">
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-primary to-blue-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-blue-700"></div>
           <div className="absolute inset-0 opacity-10 bg-pattern-dots"></div>
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mb-10"></div>
@@ -137,7 +137,7 @@ const DashboardScreen = () => {
       {/* Quick Actions & Stats */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <Card className="col-span-1 border-0 card-shadow overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500"></div>
+          <div className="h-1.5 bg-gradient-to-r from-green-500 to-emerald-500"></div>
           <CardContent className="p-5 bg-gradient-to-br from-white to-green-50">
             <div className="flex items-center gap-2 mb-2">
               <WalletIcon className="h-4 w-4 text-green-600" />
@@ -158,7 +158,7 @@ const DashboardScreen = () => {
         </Card>
         
         <Card className="col-span-1 border-0 card-shadow overflow-hidden">
-          <div className="h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500"></div>
+          <div className="h-1.5 bg-gradient-to-r from-amber-500 to-orange-500"></div>
           <CardContent className="p-5 bg-gradient-to-br from-white to-amber-50">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangleIcon className="h-4 w-4 text-amber-600" />
@@ -229,7 +229,7 @@ const DashboardScreen = () => {
       
       {/* Quick Recharge */}
       <Card className="mb-5 border-0 card-shadow overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-indigo-600 via-violet-600 to-primary"></div>
+        <div className="h-1.5 bg-gradient-to-r from-indigo-600 to-primary"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg text-gradient-purple">My Meters</CardTitle>
@@ -281,7 +281,7 @@ const DashboardScreen = () => {
       
       {/* Recent Transactions */}
       <Card className="mb-5 border-0 card-shadow overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500"></div>
+        <div className="h-1.5 bg-gradient-to-r from-teal-500 to-blue-500"></div>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg text-gradient-teal">Recent Transactions</CardTitle>
@@ -344,7 +344,7 @@ const DashboardScreen = () => {
       
       {/* Client Information */}
       <Card className="mb-4 border-0 card-shadow overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500"></div>
+        <div className="h-1.5 bg-gradient-to-r from-orange-500 to-amber-500"></div>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg text-gradient-orange">Client Information</CardTitle>
@@ -419,7 +419,7 @@ const DashboardScreen = () => {
 
       {/* Monthly Stats */}
       <Card className="mb-4 border-0 card-shadow overflow-hidden">
-        <div className="h-1.5 bg-gradient-to-r from-pink-500 via-rose-500 to-red-500"></div>
+        <div className="h-1.5 bg-gradient-to-r from-pink-500 to-red-500"></div>
         <CardHeader className="pb-0">
           <CardTitle className="text-lg text-gradient-pink">Monthly Statistics</CardTitle>
           <CardDescription>Your electricity consumption overview</CardDescription>
