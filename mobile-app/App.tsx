@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import context providers
 import { ApiProvider } from './src/context/ApiContext';
+import { NotificationProvider } from './src/context/NotificationContext';
 
 // Import screens
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -18,6 +19,10 @@ import RechargeScreen from './src/screens/RechargeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import PayDebtScreen from './src/screens/PayDebtScreen';
 import SuccessScreen from './src/screens/SuccessScreen';
+import NotificationCenterScreen from './src/screens/NotificationCenter/NotificationCenterScreen';
+
+// Import components
+import NotificationBell from './src/components/notifications/NotificationBell';
 
 // Import icons
 import { Ionicons } from '@expo/vector-icons';
@@ -63,49 +68,59 @@ function HomeTabs() {
 export default function App() {
   return (
     <ApiProvider>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <StatusBar style="auto" />
-          <Stack.Navigator
-            initialRouteName="Home"
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: '#f9fafb',
-              },
-              headerTintColor: '#3b82f6',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-          >
-            <Stack.Screen 
-              name="Home" 
-              component={HomeTabs} 
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen 
-              name="Recharge" 
-              component={RechargeScreen} 
-              options={{ title: 'Buy Electricity' }}
-            />
-            <Stack.Screen 
-              name="History" 
-              component={HistoryScreen} 
-              options={{ title: 'Transaction History' }}
-            />
-            <Stack.Screen 
-              name="PayDebt" 
-              component={PayDebtScreen} 
-              options={{ title: 'Pay Debt' }}
-            />
-            <Stack.Screen 
-              name="SuccessScreen" 
-              component={SuccessScreen} 
-              options={{ headerShown: false, gestureEnabled: false }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <NotificationProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <StatusBar style="auto" />
+            <Stack.Navigator
+              initialRouteName="Home"
+              screenOptions={({ navigation }) => ({
+                headerStyle: {
+                  backgroundColor: '#f9fafb',
+                },
+                headerTintColor: '#3b82f6',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+                headerRight: () => (
+                  <NotificationBell />
+                ),
+              })}
+            >
+              <Stack.Screen 
+                name="Home" 
+                component={HomeTabs} 
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen 
+                name="Recharge" 
+                component={RechargeScreen} 
+                options={{ title: 'Buy Electricity' }}
+              />
+              <Stack.Screen 
+                name="History" 
+                component={HistoryScreen} 
+                options={{ title: 'Transaction History' }}
+              />
+              <Stack.Screen 
+                name="PayDebt" 
+                component={PayDebtScreen} 
+                options={{ title: 'Pay Debt' }}
+              />
+              <Stack.Screen 
+                name="SuccessScreen" 
+                component={SuccessScreen} 
+                options={{ headerShown: false, gestureEnabled: false }}
+              />
+              <Stack.Screen 
+                name="NotificationCenter" 
+                component={NotificationCenterScreen} 
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </NotificationProvider>
     </ApiProvider>
   );
 }

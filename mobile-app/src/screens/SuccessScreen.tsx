@@ -1,323 +1,350 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Easing,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { formatCurrency } from '../utils/formatters';
+import { useNavigation } from '@react-navigation/native';
 
-const SuccessScreen = ({ route, navigation }) => {
-  const { type, amount, category, date, token } = route.params;
-  
-  const pulseAnim = React.useRef(new Animated.Value(1)).current;
-  const scaleAnim = React.useRef(new Animated.Value(0.3)).current;
-  const opacityAnim = React.useRef(new Animated.Value(0)).current;
-  
+const { width } = Dimensions.get('window');
+
+interface SuccessScreenProps {
+  route: {
+    params: {
+      title?: string;
+      message?: string;
+      amount?: number;
+      meterNumber?: string;
+      token?: string;
+      type?: 'recharge' | 'payment' | 'wallet';
+    };
+  };
+}
+
+const SuccessScreen = ({ route }: SuccessScreenProps) => {
+  const navigation = useNavigation();
+  const {
+    title = 'Success!',
+    message = 'Your transaction was completed successfully.',
+    amount = 0,
+    meterNumber = '',
+    token = '',
+    type = 'recharge',
+  } = route.params || {};
+
+  // Animation values
+  const circleScale = useRef(new Animated.Value(0)).current;
+  const checkmarkScale = useRef(new Animated.Value(0)).current;
+  const detailsOpacity = useRef(new Animated.Value(0)).current;
+  const buttonsOpacity = useRef(new Animated.Value(0)).current;
+
+  // Format currency
+  const formatCurrency = (value: number) => {
+    return `$${value.toFixed(2)}`;
+  };
+
+  // Get color based on transaction type
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'recharge':
+        return ['#3b82f6', '#1d4ed8']; // blue
+      case 'payment':
+        return ['#8b5cf6', '#6d28d9']; // purple
+      case 'wallet':
+        return ['#10b981', '#047857']; // green
+      default:
+        return ['#3b82f6', '#1d4ed8']; // blue
+    }
+  };
+
+  // Get icon based on transaction type
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'recharge':
+        return 'flash';
+      case 'payment':
+        return 'card';
+      case 'wallet':
+        return 'wallet';
+      default:
+        return 'checkmark-circle';
+    }
+  };
+
+  // Run animations on component mount
   useEffect(() => {
-    // Pulse animation for success icon
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.2,
-          duration: 1000,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-    
-    // Scale and fade in animations for content
-    Animated.parallel([
-      Animated.timing(scaleAnim, {
+    // Sequence of animations
+    Animated.sequence([
+      // First, animate the circle
+      Animated.timing(circleScale, {
         toValue: 1,
-        duration: 500,
-        easing: Easing.bezier(0.4, 0, 0.2, 1),
+        duration: 600,
         useNativeDriver: true,
       }),
-      Animated.timing(opacityAnim, {
+      // Then, animate the checkmark
+      Animated.timing(checkmarkScale, {
         toValue: 1,
         duration: 500,
-        easing: Easing.bezier(0.4, 0, 0.2, 1),
+        useNativeDriver: true,
+      }),
+      // Then, animate the details
+      Animated.timing(detailsOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      // Finally, animate the buttons
+      Animated.timing(buttonsOpacity, {
+        toValue: 1,
+        duration: 500,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
-  
-  const getScreenInfo = () => {
-    switch (type) {
-      case 'recharge':
-        return {
-          title: 'Recharge Successful',
-          message: 'Your electricity token has been generated successfully.',
-          icon: 'flash',
-          color: '#4f46e5',
-          gradient: ['#4f46e5', '#6366f1'],
-        };
-      case 'debt_payment':
-        return {
-          title: 'Payment Successful',
-          message: 'Your debt has been paid successfully.',
-          icon: 'checkmark-circle',
-          color: '#10b981',
-          gradient: ['#10b981', '#34d399'],
-        };
-      case 'wallet_topup':
-        return {
-          title: 'Top-Up Successful',
-          message: 'Your wallet has been topped up successfully.',
-          icon: 'wallet',
-          color: '#f59e0b',
-          gradient: ['#f59e0b', '#fbbf24'],
-        };
-      default:
-        return {
-          title: 'Operation Successful',
-          message: 'Your request has been processed successfully.',
-          icon: 'checkmark-circle',
-          color: '#4f46e5',
-          gradient: ['#4f46e5', '#6366f1'],
-        };
-    }
+
+  // Configure animations
+  const circleAnimatedStyle = {
+    transform: [
+      {
+        scale: circleScale.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        }),
+      },
+    ],
   };
-  
-  const info = getScreenInfo();
-  const dateObj = new Date(date);
-  
-  const handleDone = () => {
-    if (type === 'recharge') {
-      navigation.navigate('Dashboard');
-    } else if (type === 'debt_payment') {
-      navigation.navigate('Debts');
-    } else if (type === 'wallet_topup') {
-      navigation.navigate('Wallet');
-    } else {
-      navigation.navigate('Dashboard');
-    }
+
+  const checkmarkAnimatedStyle = {
+    transform: [
+      {
+        scale: checkmarkScale,
+      },
+    ],
+    opacity: checkmarkScale,
   };
-  
-  const handleViewHistory = () => {
-    navigation.navigate('History');
+
+  // Handle continue button press
+  const handleContinue = () => {
+    navigation.navigate('Home');
   };
-  
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Animated.View 
-        style={[
-          styles.content,
-          {
-            opacity: opacityAnim,
-            transform: [{ scale: scaleAnim }],
-          }
-        ]}
-      >
-        <LinearGradient
-          colors={info.gradient}
-          style={styles.header}
-        >
-          <Animated.View 
-            style={[
-              styles.iconContainer,
-              {
-                transform: [{ scale: pulseAnim }],
-              }
-            ]}
-          >
-            <Ionicons name={info.icon} size={48} color="white" />
-          </Animated.View>
-          <Text style={styles.title}>{info.title}</Text>
-          <Text style={styles.message}>{info.message}</Text>
-        </LinearGradient>
-        
-        <View style={styles.detailsCard}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Amount</Text>
-            <Text style={styles.detailValue}>{formatCurrency(amount)}</Text>
+    <LinearGradient
+      colors={getTypeColor(type)}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.content}>
+          {/* Animated success circle */}
+          <View style={styles.animationContainer}>
+            <Animated.View style={[styles.circle, circleAnimatedStyle]}>
+              <Animated.View style={checkmarkAnimatedStyle}>
+                <Ionicons name="checkmark" size={80} color="white" />
+              </Animated.View>
+            </Animated.View>
           </View>
-          
-          {category && (
+
+          {/* Success message */}
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
+
+          {/* Transaction details */}
+          <Animated.View style={[styles.detailsCard, { opacity: detailsOpacity }]}>
+            {/* Amount */}
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Category</Text>
-              <Text style={styles.detailValue}>{category}</Text>
+              <Text style={styles.detailLabel}>Amount</Text>
+              <Text style={styles.detailValue}>{formatCurrency(amount)}</Text>
             </View>
-          )}
-          
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Date & Time</Text>
-            <Text style={styles.detailValue}>
-              {dateObj.toLocaleDateString()} {dateObj.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </Text>
-          </View>
-          
-          {token && (
-            <View style={styles.tokenContainer}>
-              <Text style={styles.tokenLabel}>Token</Text>
-              <Text style={styles.token}>{token}</Text>
-              <TouchableOpacity style={styles.copyButton}>
-                <Ionicons name="copy-outline" size={16} color="#4f46e5" />
-                <Text style={styles.copyText}>Copy Token</Text>
-              </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Meter number (if applicable) */}
+            {meterNumber ? (
+              <>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Meter Number</Text>
+                  <Text style={styles.detailValue}>{meterNumber}</Text>
+                </View>
+                <View style={styles.divider} />
+              </>
+            ) : null}
+
+            {/* Token (if applicable) */}
+            {token ? (
+              <>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Token</Text>
+                  <View style={styles.tokenContainer}>
+                    <Text style={styles.tokenValue}>{token}</Text>
+                    <TouchableOpacity style={styles.copyButton}>
+                      <Ionicons name="copy-outline" size={18} color="#3b82f6" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={styles.divider} />
+              </>
+            ) : null}
+
+            {/* Date */}
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Date</Text>
+              <Text style={styles.detailValue}>
+                {new Date().toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </Text>
             </View>
-          )}
+          </Animated.View>
+
+          {/* Buttons */}
+          <Animated.View style={[styles.buttonContainer, { opacity: buttonsOpacity }]}>
+            <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+              <Text style={styles.continueButtonText}>Continue</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.shareButton}>
+              <Ionicons name="share-outline" size={18} color="white" />
+              <Text style={styles.shareButtonText}>Share Receipt</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
-        
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={handleDone}
-          >
-            <Text style={styles.primaryButtonText}>Done</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.secondaryButton}
-            onPress={handleViewHistory}
-          >
-            <Text style={styles.secondaryButtonText}>View Transaction History</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
-    padding: 16,
-    justifyContent: 'center',
+  },
+  safeArea: {
+    flex: 1,
   },
   content: {
+    flex: 1,
     alignItems: 'center',
-  },
-  header: {
-    width: '100%',
-    alignItems: 'center',
+    justifyContent: 'center',
     padding: 24,
-    borderRadius: 16,
-    marginBottom: 24,
   },
-  iconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+  animationContainer: {
+    marginBottom: 32,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  circle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
   },
   message: {
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 32,
     textAlign: 'center',
   },
   detailsCard: {
-    backgroundColor: 'white',
     width: '100%',
+    backgroundColor: 'white',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    alignItems: 'center',
+    paddingVertical: 12,
   },
   detailLabel: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#6b7280',
   },
   detailValue: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#1f2937',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f3f4f6',
+    width: '100%',
   },
   tokenContainer: {
-    backgroundColor: '#f3f4f6',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  tokenLabel: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 8,
-  },
-  token: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    letterSpacing: 1,
-    marginBottom: 12,
-  },
-  copyButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#e0e7ff',
-    borderRadius: 8,
-    gap: 6,
   },
-  copyText: {
-    fontSize: 14,
-    color: '#4f46e5',
-    fontWeight: '500',
+  tokenValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+    letterSpacing: 1,
+    marginRight: 8,
+  },
+  copyButton: {
+    padding: 4,
   },
   buttonContainer: {
     width: '100%',
-    gap: 12,
   },
-  primaryButton: {
-    backgroundColor: '#4f46e5',
-    paddingVertical: 14,
-    borderRadius: 8,
+  continueButton: {
+    backgroundColor: 'white',
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
+    marginBottom: 16,
   },
-  primaryButtonText: {
+  continueButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#3b82f6',
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  shareButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
     color: 'white',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4f46e5',
+    marginLeft: 8,
   },
 });
 

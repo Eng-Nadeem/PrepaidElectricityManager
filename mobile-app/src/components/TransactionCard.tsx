@@ -1,12 +1,11 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
+import {
+  View,
+  Text,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { formatCurrency } from '../utils/formatters';
 
 interface Transaction {
   id: number;
@@ -25,105 +24,121 @@ interface TransactionCardProps {
 }
 
 const TransactionCard = ({ transaction, onPress }: TransactionCardProps) => {
-  const getStatusInfo = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return {
-          icon: 'checkmark-circle',
-          color: '#10b981',
-          label: 'Completed',
-          bgColor: '#d1fae5'
-        };
-      case 'pending':
-        return {
-          icon: 'time',
-          color: '#f59e0b',
-          label: 'Pending',
-          bgColor: '#fef3c7'
-        };
-      case 'failed':
-        return {
-          icon: 'close-circle',
-          color: '#ef4444',
-          label: 'Failed',
-          bgColor: '#fee2e2'
-        };
-      default:
-        return {
-          icon: 'help-circle',
-          color: '#6b7280',
-          label: status,
-          bgColor: '#f3f4f6'
-        };
-    }
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   };
 
-  const getTypeInfo = (type: string) => {
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  // Get icon based on transaction type
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'recharge':
-        return {
-          icon: 'flash',
-          color: '#4f46e5'
-        };
+        return 'flash';
       case 'payment':
-        return {
-          icon: 'card',
-          color: '#0ea5e9'
-        };
+        return 'card';
       case 'wallet':
-        return {
-          icon: 'wallet',
-          color: '#10b981'
-        };
+        return 'wallet';
       default:
-        return {
-          icon: 'documents',
-          color: '#6b7280'
-        };
+        return 'document-text';
     }
   };
 
-  const statusInfo = getStatusInfo(transaction.status);
-  const typeInfo = getTypeInfo(transaction.type);
-  const date = new Date(transaction.createdAt);
+  // Get color based on transaction status
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return '#10b981'; // green
+      case 'pending':
+        return '#f59e0b'; // amber
+      case 'failed':
+        return '#ef4444'; // red
+      default:
+        return '#6b7280'; // gray
+    }
+  };
 
-  const handlePress = () => {
-    if (onPress) {
-      onPress(transaction);
+  // Get color based on transaction type
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'recharge':
+        return '#3b82f6'; // blue
+      case 'payment':
+        return '#8b5cf6'; // purple
+      case 'wallet':
+        return '#10b981'; // green
+      default:
+        return '#6b7280'; // gray
+    }
+  };
+
+  // Get background color based on transaction type (lighter shade)
+  const getTypeBgColor = (type: string) => {
+    switch (type) {
+      case 'recharge':
+        return '#eff6ff'; // light blue
+      case 'payment':
+        return '#f5f3ff'; // light purple
+      case 'wallet':
+        return '#ecfdf5'; // light green
+      default:
+        return '#f9fafb'; // light gray
     }
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container}
-      onPress={onPress ? handlePress : undefined}
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onPress && onPress(transaction)}
       activeOpacity={onPress ? 0.7 : 1}
     >
-      <View style={styles.leftSection}>
-        <View style={[styles.iconContainer, { backgroundColor: `${typeInfo.color}10` }]}>
-          <Ionicons name={typeInfo.icon} size={20} color={typeInfo.color} />
-        </View>
+      <View
+        style={[
+          styles.iconContainer,
+          { backgroundColor: getTypeBgColor(transaction.type) },
+        ]}
+      >
+        <Ionicons
+          name={getTypeIcon(transaction.type)}
+          size={22}
+          color={getTypeColor(transaction.type)}
+        />
       </View>
-      
-      <View style={styles.middleSection}>
-        <Text style={styles.meterName}>
-          {transaction.meterNickname || `Meter ${transaction.meterNumber.substring(0, 5)}...`}
-        </Text>
-        <Text style={styles.meterNumber}>
-          {`Meter: ${transaction.meterNumber.slice(0, 5)}...${transaction.meterNumber.slice(-4)}`}
-        </Text>
-        <Text style={styles.date}>
-          {date.toLocaleDateString()} · {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </Text>
-      </View>
-      
-      <View style={styles.rightSection}>
-        <Text style={styles.amount}>{formatCurrency(transaction.amount)}</Text>
-        <View style={[styles.statusContainer, { backgroundColor: statusInfo.bgColor }]}>
-          <Ionicons name={statusInfo.icon} size={12} color={statusInfo.color} />
-          <Text style={[styles.statusText, { color: statusInfo.color }]}>
-            {statusInfo.label}
+      <View style={styles.contentContainer}>
+        <View style={styles.titleRow}>
+          <Text style={styles.meterName}>
+            {transaction.meterNickname || transaction.meterNumber}
           </Text>
+          <Text style={styles.amount}>{formatCurrency(transaction.amount)}</Text>
+        </View>
+        <View style={styles.detailsRow}>
+          <Text style={styles.date}>{formatDate(transaction.createdAt)}</Text>
+          <View style={styles.statusContainer}>
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: getStatusColor(transaction.status) },
+              ]}
+            />
+            <Text
+              style={[
+                styles.status,
+                { color: getStatusColor(transaction.status) },
+              ]}
+            >
+              {transaction.status.charAt(0).toUpperCase() +
+                transaction.status.slice(1)}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -131,67 +146,64 @@ const TransactionCard = ({ transaction, onPress }: TransactionCardProps) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'white',
     borderRadius: 12,
+    marginVertical: 6,
     padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  leftSection: {
-    marginRight: 12,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 16,
   },
-  middleSection: {
+  contentContainer: {
     flex: 1,
   },
-  meterName: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#1f2937',
-    marginBottom: 2,
-  },
-  meterNumber: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  date: {
-    fontSize: 12,
-    color: '#9ca3af',
-  },
-  rightSection: {
-    alignItems: 'flex-end',
+  titleRow: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  meterName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   amount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#1f2937',
-    marginBottom: 8,
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  date: {
+    fontSize: 14,
+    color: '#6b7280',
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
   },
-  statusText: {
-    fontSize: 12,
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  status: {
+    fontSize: 14,
     fontWeight: '500',
   },
 });

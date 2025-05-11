@@ -20,76 +20,62 @@ A React Native mobile application built with Expo for managing prepaid electrici
 - **React Navigation**: Navigation between screens
 - **Expo Linear Gradient**: For gradient UI elements
 - **Expo Icons**: Ionicons for the UI
+- **React Native Animated**: For smooth animations
+- **TypeScript**: For type safety
 
-## Project Structure
-
-```
-mobile-app/
-├── App.tsx                 # Main application component
-├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── MeterCard.tsx   # Meter display component
-│   │   ├── TransactionCard.tsx  # Transaction history item
-│   │   └── QuickActionButton.tsx # Dashboard action buttons
-│   ├── screens/            # Application screens
-│   │   ├── DashboardScreen.tsx      # Home screen
-│   │   ├── DebtsScreen.tsx          # Debts management
-│   │   ├── MetersScreen.tsx         # Meter management
-│   │   ├── PayDebtScreen.tsx        # Debt payment confirmation
-│   │   ├── RechargeScreen.tsx       # Meter recharge 
-│   │   ├── SuccessScreen.tsx        # Payment success screen
-│   │   ├── WalletScreen.tsx         # Wallet management
-│   │   └── ...                      # Other screens
-│   ├── hooks/              # Custom React hooks
-│   ├── utils/              # Utility functions
-│   │   └── formatters.ts   # Formatting utilities for currency, dates, etc.
-│   ├── context/            # React context for app-wide state
-│   ├── api/                # API service functions
-│   └── types/              # TypeScript definitions
-```
-
-## Getting Started
+## Installation
 
 1. Install dependencies:
-   ```
-   npm install
-   ```
+```
+npm install
+```
 
 2. Start the Expo development server:
-   ```
-   npm start
-   ```
+```
+npm start
+```
 
 3. Use the Expo Go app on your mobile device or an emulator to view the application.
 
-## Converting from Web to Mobile
+## App Structure
 
-This application was converted from a React.js web application to a React Native mobile app. Key differences include:
+The app follows a clean, modular architecture:
 
-1. **Component Changes**:
-   - HTML elements replaced with React Native components
-   - CSS replaced with React Native StyleSheet
-   - Web-specific event handling adapted for touch interactions
+### Navigation
+- Bottom tab navigation for main sections (Dashboard, Wallet, Meters, Debts, Profile)
+- Stack navigation for drill-down flows
 
-2. **Navigation**:
-   - Web router (wouter) replaced with React Navigation
-   - Bottom tab navigation for main sections
-   - Stack navigation for drill-down flows
+### Screens
+- **DashboardScreen**: Home screen with overview and quick actions
+- **WalletScreen**: Manage wallet balance and view wallet transactions
+- **MetersScreen**: View and manage electricity meters
+- **DebtsScreen**: View and pay outstanding debts
+- **RechargeScreen**: Purchase electricity for a meter
+- **SuccessScreen**: Animated confirmation screen
 
-3. **Styling Adaptations**:
-   - CSS gradients converted to LinearGradient components
-   - Flexbox used extensively for layouts
-   - Pixel-perfect styling replaced with more fluid layouts
+### Components
+- **MeterCard**: Reusable component for displaying meter information
+- **TransactionCard**: Reusable component for displaying transaction information
+- **QuickActionButton**: Gradient button with icon for dashboard actions
 
-4. **Mobile-Specific Features**:
-   - Pull-to-refresh functionality
-   - Mobile-friendly input handling
-   - Touch feedback and animations
+### Services
+- **API Services**: Centralized API communication with error handling
+- **Context Provider**: Global state management for app data
 
-## Future Enhancements
+## Mobile-Specific Features
 
-1. Implement offline capability with AsyncStorage
-2. Add biometric authentication
-3. Integrate push notifications
-4. Add barcode/QR code scanner for meter identification
-5. Implement dark mode
+- Pull-to-refresh functionality for data updates
+- Touch feedback with active states on buttons
+- Native animations for smooth transitions
+- Proper keyboard handling for form inputs
+- Platform-specific styling (iOS/Android differences)
+- Gradient elements using Expo LinearGradient
+- Mobile-friendly forms and inputs
+
+## Design Considerations
+
+- Limited to 2 color gradients per element for visual consistency
+- Clear action hierarchy with prominent CTAs
+- Mobile-optimized typography and spacing
+- Consistent iconography using Ionicons
+- Proper error and empty states
