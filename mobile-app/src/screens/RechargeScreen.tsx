@@ -242,7 +242,7 @@ const RechargeScreen = () => {
                 </Text>
                 {method.id === 'wallet' && (
                   <Text style={styles.walletBalanceText}>
-                    Balance: ${walletBalance.toFixed(2)}
+                    Balance: ${typeof walletBalance === 'number' ? walletBalance.toFixed(2) : '0.00'}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -254,7 +254,7 @@ const RechargeScreen = () => {
           <Text style={styles.estimatedUnitsLabel}>Estimated Units:</Text>
           <Text style={styles.estimatedUnitsValue}>
             {amount && !isNaN(parseFloat(amount)) 
-              ? `~${(parseFloat(amount) / 0.45).toFixed(2)} kWh` 
+              ? `~${(parseFloat(amount || '0') / 0.45).toFixed(2)} kWh` 
               : '0.00 kWh'}
           </Text>
         </View>

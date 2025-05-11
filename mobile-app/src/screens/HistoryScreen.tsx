@@ -159,7 +159,9 @@ const HistoryScreen = () => {
       
       <View style={styles.transactionAmountContainer}>
         <Text style={styles.transactionAmount}>
-          ${parseFloat(item.amount).toFixed(2)}
+          ${typeof item.amount === 'number' || typeof item.amount === 'string' 
+            ? parseFloat(item.amount.toString()).toFixed(2) 
+            : '0.00'}
         </Text>
         
         <Text
