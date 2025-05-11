@@ -1,10 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { registerMockRoutes } from "./mockRoutes";
+import { registerMongoRoutes } from "./mongoRoutes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Flag to use mock data
-const USE_MOCK_DATA = true;
+// Database options
+const DATABASE_OPTION = 'mongodb';
 
 const app = express();
 app.use(express.json());
@@ -41,10 +42,19 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Use mock routes if USE_MOCK_DATA is true
-  const server = USE_MOCK_DATA 
-    ? await registerMockRoutes(app) 
-    : await registerRoutes(app);
+  // Select database implementation based on DATABASE_OPTION
+  let server;
+  
+  if (DATABASE_OPTION === 'mongodb') {
+    server = await registerMongoRoutes(app);
+  } else if (DATABASE_OPTION === 'mock') {
+    server = await registerMockRoutes(app);
+  } else if (DATABASE_OPTION === 'postgresql') {
+    server = await registerRoutes(app);
+  } else {
+    // Default to mock if undefined
+    server = await registerMockRoutes(app);
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -73,6 +83,6 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
-    log(`${USE_MOCK_DATA ? 'Using MOCK data' : 'Using REAL database'}`);
+    log(`Using ${DATABASE_OPTION.toUpperCase()} database`);
   });
 })();
