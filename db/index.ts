@@ -1,16 +1,8 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+// This file is maintained for compatibility with other parts of the application
+// We're actually using MongoDB for this project, not PostgreSQL
 
-// This is the correct way neon config - DO NOT change this
-neonConfig.webSocketConstructor = ws;
+// Create dummy exports to avoid breaking imports
+export const pool = null;
+export const db = { query: {}, insert: () => {}, select: () => {} };
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
-
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+console.log("MongoDB is the primary database for this application. PostgreSQL is not being used.");

@@ -5,7 +5,7 @@ import { registerMongoRoutes } from "./mongoRoutes";
 import { setupVite, serveStatic, log } from "./vite";
 import { connectToDatabase } from "../db/mongodb";
 
-// Initial database option
+// Using MongoDB as our database
 let DATABASE_OPTION = 'mongodb';
 
 // Create application
@@ -50,21 +50,26 @@ app.use((req, res, next) => {
   // Try to connect to MongoDB first if that's the intended option
   if (DATABASE_OPTION === 'mongodb') {
     try {
-      // Attempt MongoDB connection
-      const isConnected = await connectToDatabase();
-      
-      if (isConnected) {
-        log('MongoDB connected successfully, using MongoDB routes', 'mongodb');
-        server = await registerMongoRoutes(app);
-      } else {
-        // Fall back to mock data if MongoDB connection fails
-        log('Failed to connect to MongoDB, falling back to mock data', 'mongodb');
-        DATABASE_OPTION = 'mock';
+      // Check if MONGODB_URI is set
+      if (!process.env.MONGODB_URI) {
+        log('MONGODB_URI is not set. Please provide a valid MongoDB connection string.', 'mongodb');
+        log('Falling back to mock data for now.', 'mongodb');
         server = await registerMockRoutes(app);
+      } else {
+        // Attempt MongoDB connection
+        const isConnected = await connectToDatabase();
+        
+        if (isConnected) {
+          log('MongoDB connected successfully, using MongoDB routes', 'mongodb');
+          server = await registerMongoRoutes(app);
+        } else {
+          // Fall back to mock data if MongoDB connection fails
+          log('Failed to connect to MongoDB, falling back to mock data', 'mongodb');
+          server = await registerMockRoutes(app);
+        }
       }
     } catch (error) {
       log(`MongoDB error: ${error}. Falling back to mock data`, 'mongodb');
-      DATABASE_OPTION = 'mock';
       server = await registerMockRoutes(app);
     }
   } else if (DATABASE_OPTION === 'mock') {
