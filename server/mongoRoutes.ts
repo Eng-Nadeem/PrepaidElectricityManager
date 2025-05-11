@@ -231,6 +231,7 @@ export async function registerMongoRoutes(app: Express): Promise<Server> {
   app.get('/api/debts', async (req, res) => {
     try {
       const userData = await mongoStorage.getUserProfile();
+      // Pass the user ID as string or ObjectId - our function will handle it
       const userDebts = await mongoStorage.getUserDebts(userData._id);
       res.json(userDebts);
     } catch (error) {
@@ -338,6 +339,7 @@ export async function registerMongoRoutes(app: Express): Promise<Server> {
   app.get('/api/wallet/transactions', async (req, res) => {
     try {
       const userData = await mongoStorage.getUserProfile();
+      // Pass the user ID as string or ObjectId - our function will handle it
       const transactions = await mongoStorage.getWalletTransactions(userData._id);
       res.json(transactions);
     } catch (error) {
