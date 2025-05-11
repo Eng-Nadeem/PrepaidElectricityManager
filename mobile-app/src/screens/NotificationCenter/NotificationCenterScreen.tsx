@@ -18,11 +18,13 @@ import NotificationList from '../../components/notifications/NotificationList';
 import { Notification } from '../../services/notificationService';
 import { useNotifications } from '../../context/NotificationContext';
 import NotificationSettingsList from './NotificationSettingsList';
+import ScheduledNotificationsScreen from './ScheduledNotificationsScreen';
 
 const { height } = Dimensions.get('window');
 
 enum Tab {
   All = 'all',
+  Scheduled = 'scheduled',
   Settings = 'settings',
 }
 
@@ -39,12 +41,18 @@ const NotificationCenterScreen: React.FC = () => {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   
   // Animated values for tab indicator
-  const tabIndicatorPosition = useRef(new Animated.Value(initialTab === Tab.All ? 0 : 1)).current;
+  const tabIndicatorPosition = useRef(new Animated.Value(
+    initialTab === Tab.All ? 0 : initialTab === Tab.Scheduled ? 1 : 2
+  )).current;
   
   // Update tab indicator when activeTab changes
   useEffect(() => {
+    let toValue = 0;
+    if (activeTab === Tab.Scheduled) toValue = 1;
+    if (activeTab === Tab.Settings) toValue = 2;
+    
     Animated.timing(tabIndicatorPosition, {
-      toValue: activeTab === Tab.All ? 0 : 1,
+      toValue,
       duration: 250,
       useNativeDriver: false,
     }).start();
@@ -82,8 +90,8 @@ const NotificationCenterScreen: React.FC = () => {
   
   // Calculate tab indicator position
   const tabIndicatorLeft = tabIndicatorPosition.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '50%'],
+    inputRange: [0, 1, 2],
+    outputRange: ['0%', '33.33%', '66.66%'],
   });
   
   // Test notification (development only)
@@ -125,7 +133,7 @@ const NotificationCenterScreen: React.FC = () => {
         >
           <Ionicons
             name="notifications-outline"
-            size={20}
+            size={18}
             color={activeTab === Tab.All ? '#3b82f6' : '#6b7280'}
           />
           <Text
@@ -139,12 +147,31 @@ const NotificationCenterScreen: React.FC = () => {
         </TouchableOpacity>
         
         <TouchableOpacity
+          style={[styles.tab, activeTab === Tab.Scheduled && styles.activeTab]}
+          onPress={() => handleTabPress(Tab.Scheduled)}
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={18}
+            color={activeTab === Tab.Scheduled ? '#3b82f6' : '#6b7280'}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === Tab.Scheduled && styles.activeTabText,
+            ]}
+          >
+            Scheduled
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
           style={[styles.tab, activeTab === Tab.Settings && styles.activeTab]}
           onPress={() => handleTabPress(Tab.Settings)}
         >
           <Ionicons
             name="settings-outline"
-            size={20}
+            size={18}
             color={activeTab === Tab.Settings ? '#3b82f6' : '#6b7280'}
           />
           <Text
@@ -162,6 +189,7 @@ const NotificationCenterScreen: React.FC = () => {
             styles.tabIndicator,
             {
               left: tabIndicatorLeft,
+              width: '33.33%',
             },
           ]}
         />
@@ -173,6 +201,8 @@ const NotificationCenterScreen: React.FC = () => {
           <NotificationList
             onNotificationPress={handleNotificationPress}
           />
+        ) : activeTab === Tab.Scheduled ? (
+          <ScheduledNotificationsScreen />
         ) : (
           <NotificationSettingsList />
         )}
@@ -271,7 +301,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {},
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     color: '#6b7280',
     marginLeft: 4,
@@ -282,7 +312,6 @@ const styles = StyleSheet.create({
   tabIndicator: {
     position: 'absolute',
     bottom: 0,
-    width: '50%',
     height: 2,
     backgroundColor: '#3b82f6',
   },

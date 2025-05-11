@@ -4,8 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-// Import context providers
+// API Provider
 import { ApiProvider } from './src/context/ApiContext';
 import { NotificationProvider } from './src/context/NotificationContext';
 
@@ -18,18 +20,18 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import RechargeScreen from './src/screens/RechargeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import PayDebtScreen from './src/screens/PayDebtScreen';
+import PaymentConfirmationScreen from './src/screens/PaymentConfirmationScreen';
+import ProcessingScreen from './src/screens/ProcessingScreen';
 import SuccessScreen from './src/screens/SuccessScreen';
 import NotificationCenterScreen from './src/screens/NotificationCenter/NotificationCenterScreen';
 
-// Import components
+// Import notification components
 import NotificationBell from './src/components/notifications/NotificationBell';
-
-// Import icons
-import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// Tab navigator
 function HomeTabs() {
   return (
     <Tab.Navigator
@@ -44,14 +46,14 @@ function HomeTabs() {
           } else if (route.name === 'Meters') {
             iconName = focused ? 'flash' : 'flash-outline';
           } else if (route.name === 'Debts') {
-            iconName = focused ? 'card' : 'card-outline';
+            iconName = focused ? 'receipt' : 'receipt-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#3b82f6',
+        tabBarActiveTintColor: '#3B82F6',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}
@@ -65,62 +67,32 @@ function HomeTabs() {
   );
 }
 
+// Main app with navigation
 export default function App() {
   return (
-    <ApiProvider>
-      <NotificationProvider>
-        <SafeAreaProvider>
+    <SafeAreaProvider>
+      <ApiProvider>
+        <NotificationProvider>
           <NavigationContainer>
-            <StatusBar style="auto" />
             <Stack.Navigator
               initialRouteName="Home"
-              screenOptions={({ navigation }) => ({
-                headerStyle: {
-                  backgroundColor: '#f9fafb',
-                },
-                headerTintColor: '#3b82f6',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                },
-                headerRight: () => (
-                  <NotificationBell />
-                ),
-              })}
+              screenOptions={{
+                headerShown: false,
+              }}
             >
-              <Stack.Screen 
-                name="Home" 
-                component={HomeTabs} 
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen 
-                name="Recharge" 
-                component={RechargeScreen} 
-                options={{ title: 'Buy Electricity' }}
-              />
-              <Stack.Screen 
-                name="History" 
-                component={HistoryScreen} 
-                options={{ title: 'Transaction History' }}
-              />
-              <Stack.Screen 
-                name="PayDebt" 
-                component={PayDebtScreen} 
-                options={{ title: 'Pay Debt' }}
-              />
-              <Stack.Screen 
-                name="SuccessScreen" 
-                component={SuccessScreen} 
-                options={{ headerShown: false, gestureEnabled: false }}
-              />
-              <Stack.Screen 
-                name="NotificationCenter" 
-                component={NotificationCenterScreen} 
-                options={{ headerShown: false }}
-              />
+              <Stack.Screen name="Home" component={HomeTabs} />
+              <Stack.Screen name="Recharge" component={RechargeScreen} />
+              <Stack.Screen name="History" component={HistoryScreen} />
+              <Stack.Screen name="PayDebt" component={PayDebtScreen} />
+              <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmationScreen} />
+              <Stack.Screen name="Processing" component={ProcessingScreen} />
+              <Stack.Screen name="Success" component={SuccessScreen} />
+              <Stack.Screen name="NotificationCenter" component={NotificationCenterScreen} />
             </Stack.Navigator>
           </NavigationContainer>
-        </SafeAreaProvider>
-      </NotificationProvider>
-    </ApiProvider>
+        </NotificationProvider>
+      </ApiProvider>
+      <StatusBar style="auto" />
+    </SafeAreaProvider>
   );
 }
