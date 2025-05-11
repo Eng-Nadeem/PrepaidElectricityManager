@@ -17,7 +17,7 @@ import {
   MOCK_WALLET,
   MOCK_USER_PROFILE,
   simulateApiDelay
-} from "../mobile-app/src/services/mockDataService";
+} from "./mockData";
 
 export async function registerMockRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
