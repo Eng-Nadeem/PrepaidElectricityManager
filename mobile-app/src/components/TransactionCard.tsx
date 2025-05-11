@@ -35,8 +35,10 @@ const TransactionCard = ({ transaction, onPress }: TransactionCardProps) => {
   };
 
   // Format currency
-  const formatCurrency = (amount: number) => {
-    return `$${amount.toFixed(2)}`;
+  const formatCurrency = (amount: number | string | null | undefined) => {
+    if (amount === null || amount === undefined) return '$0.00';
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return `$${numAmount.toFixed(2)}`;
   };
 
   // Get icon based on transaction type

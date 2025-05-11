@@ -6,6 +6,19 @@ const MONGODB_URI = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mong
 // Connect to MongoDB
 export const connectToDatabase = async () => {
   try {
+    // Validate MongoDB URI format
+    if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/prepaid_meter_app') {
+      console.log('No MongoDB URI provided. Using mock data instead.');
+      throw new Error('No valid MongoDB URI provided');
+    }
+
+    // Check if URI is valid format before attempting connection
+    const validMongoUriPattern = /^mongodb(\+srv)?:\/\/.+:.+@.+\/.*/;
+    if (!validMongoUriPattern.test(MONGODB_URI)) {
+      console.error('Invalid MongoDB URI format. URI should follow the pattern: mongodb(+srv)://username:password@hostname/database');
+      throw new Error('Invalid MongoDB URI format');
+    }
+
     // Log connection string for debugging (masking credentials)
     const sanitizedUri = MONGODB_URI.replace(
       /mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/,
@@ -13,15 +26,11 @@ export const connectToDatabase = async () => {
     );
     console.log('Attempting to connect to MongoDB:', sanitizedUri);
 
-    // Use mock data if MongoDB is not available
-    if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/prepaid_meter_app') {
-      console.log('No MongoDB URI provided. Using mock data instead.');
-      throw new Error('No valid MongoDB URI provided');
-    }
-
     // Connect with options
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+      serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+      retryWrites: true,
+      w: 'majority'
     });
     
     console.log('MongoDB connection successful');
@@ -29,6 +38,18 @@ export const connectToDatabase = async () => {
   } catch (error) {
     console.error('MongoDB connection error:', error);
     console.log('Falling back to mock data.');
+    
+    // Log more detailed error info to help with troubleshooting
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      if (error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
+        console.error('MongoDB server is not reachable. Check your connection string, especially the hostname part.');
+      } else if (error.message.includes('Authentication failed')) {
+        console.error('MongoDB authentication failed. Check your username and password.');
+      }
+    }
+    
     return false;
   }
 };

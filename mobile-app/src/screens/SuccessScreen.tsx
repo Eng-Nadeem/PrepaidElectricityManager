@@ -46,7 +46,8 @@ const SuccessScreen = ({ route }: SuccessScreenProps) => {
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
   // Format currency
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | null | undefined) => {
+    if (value === null || value === undefined) return '$0.00';
     return `$${value.toFixed(2)}`;
   };
 
