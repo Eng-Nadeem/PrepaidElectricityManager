@@ -5,6 +5,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// Import context providers
+import { ApiProvider } from './src/context/ApiContext';
+
 // Import screens
 import DashboardScreen from './src/screens/DashboardScreen';
 import WalletScreen from './src/screens/WalletScreen';
@@ -14,6 +17,7 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import RechargeScreen from './src/screens/RechargeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import PayDebtScreen from './src/screens/PayDebtScreen';
+import SuccessScreen from './src/screens/SuccessScreen';
 
 // Import icons
 import { Ionicons } from '@expo/vector-icons';
@@ -58,43 +62,50 @@ function HomeTabs() {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <StatusBar style="auto" />
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#f9fafb',
-            },
-            headerTintColor: '#3b82f6',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-        >
-          <Stack.Screen 
-            name="Home" 
-            component={HomeTabs} 
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen 
-            name="Recharge" 
-            component={RechargeScreen} 
-            options={{ title: 'Buy Electricity' }}
-          />
-          <Stack.Screen 
-            name="History" 
-            component={HistoryScreen} 
-            options={{ title: 'Transaction History' }}
-          />
-          <Stack.Screen 
-            name="PayDebt" 
-            component={PayDebtScreen} 
-            options={{ title: 'Pay Debt' }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <ApiProvider>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <StatusBar style="auto" />
+          <Stack.Navigator
+            initialRouteName="Home"
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: '#f9fafb',
+              },
+              headerTintColor: '#3b82f6',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <Stack.Screen 
+              name="Home" 
+              component={HomeTabs} 
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen 
+              name="Recharge" 
+              component={RechargeScreen} 
+              options={{ title: 'Buy Electricity' }}
+            />
+            <Stack.Screen 
+              name="History" 
+              component={HistoryScreen} 
+              options={{ title: 'Transaction History' }}
+            />
+            <Stack.Screen 
+              name="PayDebt" 
+              component={PayDebtScreen} 
+              options={{ title: 'Pay Debt' }}
+            />
+            <Stack.Screen 
+              name="SuccessScreen" 
+              component={SuccessScreen} 
+              options={{ headerShown: false, gestureEnabled: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </ApiProvider>
   );
 }
