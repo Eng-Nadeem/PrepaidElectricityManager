@@ -17,9 +17,10 @@ interface Meter {
 interface MeterCardProps {
   meter: Meter;
   onSelect: (meter: Meter) => void;
+  onEdit?: (meter: Meter) => void;
 }
 
-const MeterCard = ({ meter, onSelect }: MeterCardProps) => {
+const MeterCard = ({ meter, onSelect, onEdit }: MeterCardProps) => {
   return (
     <TouchableOpacity
       style={styles.card}
@@ -35,9 +36,22 @@ const MeterCard = ({ meter, onSelect }: MeterCardProps) => {
         </Text>
         <Text style={styles.meterNumber}>{meter.meterNumber}</Text>
       </View>
-      <View style={styles.arrowContainer}>
-        <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-      </View>
+      {onEdit ? (
+        <View style={styles.actionContainer}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => onEdit(meter)}
+          >
+            <Ionicons name="pencil" size={16} color="#6b7280" />
+          </TouchableOpacity>
+          <View style={styles.actionDivider} />
+          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+        </View>
+      ) : (
+        <View style={styles.arrowContainer}>
+          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -77,6 +91,20 @@ const styles = StyleSheet.create({
   },
   arrowContainer: {
     paddingLeft: 8,
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editButton: {
+    padding: 8,
+    borderRadius: 16,
+  },
+  actionDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 8,
   },
 });
 
