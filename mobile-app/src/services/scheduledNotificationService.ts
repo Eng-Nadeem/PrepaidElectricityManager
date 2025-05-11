@@ -7,6 +7,7 @@ import {
   getTemplateById,
   getRandomEnergyTip
 } from './notificationTemplates';
+import { MOCK_SCHEDULED_NOTIFICATIONS, simulateApiDelay } from './mockDataService';
 
 // Scheduled notification interface
 export interface ScheduledNotification {
@@ -27,11 +28,19 @@ export interface ScheduledNotification {
 // Storage key
 const SCHEDULED_NOTIFICATIONS_KEY = 'scheduled_notifications';
 
+// Flag to use mock data (set to true to always use mock data)
+const USE_MOCK_DATA = true;
+
 // Save scheduled notifications
 export async function saveScheduledNotifications(
   notifications: ScheduledNotification[]
 ): Promise<void> {
   try {
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      return;
+    }
+    
     await AsyncStorage.setItem(
       SCHEDULED_NOTIFICATIONS_KEY,
       JSON.stringify(notifications)
@@ -44,6 +53,11 @@ export async function saveScheduledNotifications(
 // Get scheduled notifications
 export async function getScheduledNotifications(): Promise<ScheduledNotification[]> {
   try {
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      return [...MOCK_SCHEDULED_NOTIFICATIONS];
+    }
+    
     const data = await AsyncStorage.getItem(SCHEDULED_NOTIFICATIONS_KEY);
     if (data) {
       return JSON.parse(data);
@@ -51,7 +65,9 @@ export async function getScheduledNotifications(): Promise<ScheduledNotification
     return [];
   } catch (error) {
     console.error('Error getting scheduled notifications:', error);
-    return [];
+    // Fallback to mock data
+    await simulateApiDelay();
+    return [...MOCK_SCHEDULED_NOTIFICATIONS];
   }
 }
 
@@ -96,6 +112,13 @@ export async function createScheduledNotification(
       enabled: true,
     };
 
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      // Add to mock data
+      MOCK_SCHEDULED_NOTIFICATIONS.push(newNotification);
+      return newNotification;
+    }
+
     // Schedule the notification
     const notificationId = await scheduleExpoNotification(newNotification, template);
     if (notificationId) {
@@ -119,6 +142,23 @@ export async function updateScheduledNotification(
   updates: Partial<Omit<ScheduledNotification, 'id'>>
 ): Promise<ScheduledNotification | null> {
   try {
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      // Update mock data
+      const notificationIndex = MOCK_SCHEDULED_NOTIFICATIONS.findIndex(n => n.id === id);
+      if (notificationIndex === -1) {
+        throw new Error(`Notification with ID ${id} not found`);
+      }
+      
+      const updatedNotification = {
+        ...MOCK_SCHEDULED_NOTIFICATIONS[notificationIndex],
+        ...updates,
+      };
+      
+      MOCK_SCHEDULED_NOTIFICATIONS[notificationIndex] = updatedNotification;
+      return updatedNotification;
+    }
+    
     const notifications = await getScheduledNotifications();
     const notificationIndex = notifications.findIndex(n => n.id === id);
     
@@ -164,6 +204,18 @@ export async function updateScheduledNotification(
 // Delete a scheduled notification
 export async function deleteScheduledNotification(id: string): Promise<boolean> {
   try {
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      // Update mock data
+      const index = MOCK_SCHEDULED_NOTIFICATIONS.findIndex(n => n.id === id);
+      if (index === -1) {
+        return false;
+      }
+      
+      MOCK_SCHEDULED_NOTIFICATIONS.splice(index, 1);
+      return true;
+    }
+    
     const notifications = await getScheduledNotifications();
     const notification = notifications.find(n => n.id === id);
     
@@ -190,6 +242,18 @@ export async function deleteScheduledNotification(id: string): Promise<boolean> 
 // Toggle scheduled notification enabled state
 export async function toggleScheduledNotification(id: string): Promise<ScheduledNotification | null> {
   try {
+    if (USE_MOCK_DATA) {
+      await simulateApiDelay();
+      // Update mock data
+      const index = MOCK_SCHEDULED_NOTIFICATIONS.findIndex(n => n.id === id);
+      if (index === -1) {
+        throw new Error(`Notification with ID ${id} not found`);
+      }
+      
+      MOCK_SCHEDULED_NOTIFICATIONS[index].enabled = !MOCK_SCHEDULED_NOTIFICATIONS[index].enabled;
+      return MOCK_SCHEDULED_NOTIFICATIONS[index];
+    }
+    
     const notifications = await getScheduledNotifications();
     const notificationIndex = notifications.findIndex(n => n.id === id);
     
