@@ -226,7 +226,7 @@ const PaymentConfirmationScreen = () => {
             
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Amount</Text>
-              <Text style={styles.summaryValue}>${parseFloat(transactionData.amount).toFixed(2)}</Text>
+              <Text style={styles.summaryValue}>${transactionData?.amount ? parseFloat(transactionData.amount.toString()).toFixed(2) : '0.00'}</Text>
             </View>
             
             <View style={styles.summaryItem}>
@@ -251,7 +251,9 @@ const PaymentConfirmationScreen = () => {
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Estimated Units</Text>
               <Text style={styles.summaryValue}>
-                ~{(parseFloat(transactionData.amount) / 0.45).toFixed(2)} kWh
+                ~{transactionData?.amount 
+                  ? (parseFloat(transactionData.amount.toString()) / 0.45).toFixed(2) 
+                  : '0.00'} kWh
               </Text>
             </View>
           </View>
@@ -278,7 +280,7 @@ const PaymentConfirmationScreen = () => {
           ) : (
             <>
               <Text style={styles.payButtonText}>
-                Pay ${parseFloat(transactionData.amount).toFixed(2)}
+                Pay ${transactionData?.amount ? parseFloat(transactionData.amount.toString()).toFixed(2) : '0.00'}
               </Text>
               <Ionicons name="arrow-forward" size={20} color="white" />
             </>

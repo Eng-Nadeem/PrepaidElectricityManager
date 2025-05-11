@@ -54,8 +54,10 @@ const DashboardScreen = () => {
   };
 
   // Format numbers to currency
-  const formatCurrency = (value: number) => {
-    return `$${value.toFixed(2)}`;
+  const formatCurrency = (value: number | string | undefined | null) => {
+    if (value === undefined || value === null) return '$0.00';
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    return !isNaN(numValue) ? `$${numValue.toFixed(2)}` : '$0.00';
   };
 
   // Navigate to meter recharge
