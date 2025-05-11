@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 // MongoDB connection URL
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/prepaid_meter_app';
+const MONGODB_URI = process.env.DATABASE_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/prepaid_meter_app';
 
 // Connect to MongoDB
 export const connectToDatabase = async () => {
