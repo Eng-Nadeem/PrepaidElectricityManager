@@ -6,11 +6,30 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/prepai
 // Connect to MongoDB
 export const connectToDatabase = async () => {
   try {
-    await mongoose.connect(MONGODB_URI);
+    // Log connection string for debugging (masking credentials)
+    const sanitizedUri = MONGODB_URI.replace(
+      /mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/,
+      'mongodb$1://$2:***@'
+    );
+    console.log('Attempting to connect to MongoDB:', sanitizedUri);
+
+    // Use mock data if MongoDB is not available
+    if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/prepaid_meter_app') {
+      console.log('No MongoDB URI provided. Using mock data instead.');
+      throw new Error('No valid MongoDB URI provided');
+    }
+
+    // Connect with options
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+    });
+    
     console.log('MongoDB connection successful');
+    return true;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    throw error;
+    console.log('Falling back to mock data.');
+    return false;
   }
 };
 

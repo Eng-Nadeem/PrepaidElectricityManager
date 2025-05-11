@@ -3,10 +3,12 @@ import { registerRoutes } from "./routes";
 import { registerMockRoutes } from "./mockRoutes";
 import { registerMongoRoutes } from "./mongoRoutes";
 import { setupVite, serveStatic, log } from "./vite";
+import { connectToDatabase } from "../db/mongodb";
 
-// Database options
-const DATABASE_OPTION = 'mongodb';
+// Initial database option
+let DATABASE_OPTION = 'mongodb';
 
+// Create application
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -45,8 +47,26 @@ app.use((req, res, next) => {
   // Select database implementation based on DATABASE_OPTION
   let server;
   
+  // Try to connect to MongoDB first if that's the intended option
   if (DATABASE_OPTION === 'mongodb') {
-    server = await registerMongoRoutes(app);
+    try {
+      // Attempt MongoDB connection
+      const isConnected = await connectToDatabase();
+      
+      if (isConnected) {
+        log('MongoDB connected successfully, using MongoDB routes', 'mongodb');
+        server = await registerMongoRoutes(app);
+      } else {
+        // Fall back to mock data if MongoDB connection fails
+        log('Failed to connect to MongoDB, falling back to mock data', 'mongodb');
+        DATABASE_OPTION = 'mock';
+        server = await registerMockRoutes(app);
+      }
+    } catch (error) {
+      log(`MongoDB error: ${error}. Falling back to mock data`, 'mongodb');
+      DATABASE_OPTION = 'mock';
+      server = await registerMockRoutes(app);
+    }
   } else if (DATABASE_OPTION === 'mock') {
     server = await registerMockRoutes(app);
   } else if (DATABASE_OPTION === 'postgresql') {
